@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Methodology & Architecture — VERIFAI</title>
+  <meta name="description" content="Technical documentation detailing dataset benchmarks, feature vectorization pipelines, and explainable AI mechanisms for VERIFAI.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="VERIFAI Home">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        <span>VERIFAI</span>
+        <span class="brand-tagline">Detection System</span>
+      </a>
+
+      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav id="navMenu" class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="detector.html" class="nav-link">Detector</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="history.html" class="nav-link">History</a>
+        <a href="methodology.html" class="nav-link active">Methodology</a>
+      </nav>
+
+      <div id="navAuthContainer" class="nav-actions">
+        <!-- Dynamic auth state -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content section">
+    <div class="container container-narrow">
+
+      <!-- Header -->
+      <div style="margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 24px;">
+        <span class="editorial-eyebrow">Technical Documentation & Research Whitepaper</span>
+        <h1 class="editorial-heading-1" style="font-size: 32px; margin-top: 6px; margin-bottom: 12px;">
+          Architecture, Datasets, and Linguistic Modeling
+        </h1>
+        <p class="editorial-lead">
+          An overview of the machine learning design choices, training corpora, and interpretability frameworks underlying the VERIFAI platform.
+        </p>
+      </div>
+
+      <!-- Section 1: Abstract & Problem Statement -->
+      <section style="margin-bottom: 48px;">
+        <h2 class="editorial-heading-2" style="font-size: 22px; margin-bottom: 12px;">1. Problem Formulation & Scope</h2>
+        <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px;">
+          Automated misinformation detection presents unique challenges due to stylistic evolution, weaponized sensationalism, and high-frequency content generation. Traditional black-box neural approaches frequently suffer from severe generalization degradation when exposed to unseen topics or emerging political events.
+        </p>
+        <p style="color: var(--text-secondary); line-height: 1.7;">
+          VERIFAI addresses this via an <strong>ensemble hybrid architecture</strong> that pairs transformer-based contextual representations with explicit stylometric indicators (such as hyperbole density, affective polarity, and named attribution verification), ensuring that predictions are both quantitatively robust and human-interpretable.
+        </p>
+      </section>
+
+      <!-- Section 2: Benchmark Datasets -->
+      <section id="datasets" style="margin-bottom: 48px;">
+        <h2 class="editorial-heading-2" style="font-size: 22px; margin-bottom: 12px;">2. Training Corpora & Benchmarks</h2>
+        <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px;">
+          To mitigate single-dataset inductive bias, models are evaluated against three widely referenced academic benchmarks in natural language processing:
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          
+          <div class="card" style="padding: 18px;">
+            <div class="flex items-center justify-between" style="margin-bottom: 6px;">
+              <h4 style="font-size: 15px; font-weight: 600;">ISOT Fake News Dataset (University of Victoria)</h4>
+              <span class="badge badge-neutral text-mono">44,898 Records</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+              Contains real articles extracted from Reuters.com and unverified articles from flagged conspiracy blogs. Used primarily for evaluating stylistic wire datelines and sensational headline markers.
+            </p>
+          </div>
+
+          <div class="card" style="padding: 18px;">
+            <div class="flex items-center justify-between" style="margin-bottom: 6px;">
+              <h4 style="font-size: 15px; font-weight: 600;">WELFake Unified Corpus (IEEE DataPort)</h4>
+              <span class="badge badge-neutral text-mono">72,131 Records</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+              A curated composite combining Kaggle Fake News, McIntire, and ISOT datasets to balance domain distribution across health, finance, foreign policy, and science reporting.
+            </p>
+          </div>
+
+          <div class="card" style="padding: 18px;">
+            <div class="flex items-center justify-between" style="margin-bottom: 6px;">
+              <h4 style="font-size: 15px; font-weight: 600;">LIAR Benchmark (PolitiFact Corpus)</h4>
+              <span class="badge badge-neutral text-mono">12,836 Records</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+              Short-claim factual verification annotated across a 6-tier truthfulness scale (Pants-on-Fire, False, Barely-True, Half-True, Mostly-True, True). Used for calibrate borderline confidence levels.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 3: NLP Pipeline Architecture -->
+      <section id="architecture" style="margin-bottom: 48px;">
+        <h2 class="editorial-heading-2" style="font-size: 22px; margin-bottom: 12px;">3. Multi-Layer Feature Pipeline</h2>
+        <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px;">
+          Rather than relying exclusively on dense vector embeddings, the inference pipeline extracts four complementary linguistic feature dimensions:
+        </p>
+
+        <div class="card" style="padding: 24px; background: var(--bg-card);">
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 18px;">
+            <li style="display: flex; gap: 14px;">
+              <span style="font-family: var(--font-family-mono); font-weight: 700; color: var(--text-muted);">A.</span>
+              <div>
+                <strong style="font-size: 14px; color: var(--text-primary);">Stylometric & Entropy Markers:</strong>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 3px;">
+                  Calculates Type-Token Ratio (TTR), uppercase letter percentage, exclamation density, and superlative/adverb ratios that correlate heavily with manufactured urgency.
+                </p>
+              </div>
+            </li>
+
+            <li style="display: flex; gap: 14px;">
+              <span style="font-family: var(--font-family-mono); font-weight: 700; color: var(--text-muted);">B.</span>
+              <div>
+                <strong style="font-size: 14px; color: var(--text-primary);">Named Entity & Attribution Verification:</strong>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 3px;">
+                  Parses dependency grammar to detect reporting verbs ("confirmed", "stated", "published") paired with named institutions or recognized specialists versus anonymous claims ("insiders claim", "they don't want you to know").
+                </p>
+              </div>
+            </li>
+
+            <li style="display: flex; gap: 14px;">
+              <span style="font-family: var(--font-family-mono); font-weight: 700; color: var(--text-muted);">C.</span>
+              <div>
+                <strong style="font-size: 14px; color: var(--text-primary);">Readability & Syntactic Complexity:</strong>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 3px;">
+                  Applies Flesch-Kincaid and Gunning-Fog algorithms to detect syntactic fragmentation commonly observed in autogenerated content farms.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 4: Explainable AI (XAI) -->
+      <section id="xai" style="margin-bottom: 48px;">
+        <h2 class="editorial-heading-2" style="font-size: 22px; margin-bottom: 12px;">4. Explainable AI (XAI) & Interpretability</h2>
+        <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px;">
+          A key design requirement for this final year project is transparency. In high-stakes media literacy and journalism, users must understand <em>why</em> a piece of content was flagged.
+        </p>
+        <p style="color: var(--text-secondary); line-height: 1.7;">
+          VERIFAI implements a token attribution mechanism inspired by LIME (Local Interpretable Model-agnostic Explanations) and Integrated Gradients. Each input token receives a calculated directional weight indicating whether it shifted the prediction toward <span style="color: var(--status-fake); font-weight: 600;">Fabricated</span> or <span style="color: var(--status-real); font-weight: 600;">Legitimate</span>.
+        </p>
+      </section>
+
+      <!-- Section 5: Ethical Considerations & Limitations -->
+      <section id="ethics" style="margin-bottom: 48px;">
+        <h2 class="editorial-heading-2" style="font-size: 22px; margin-bottom: 12px;">5. Ethical Boundaries & Limitations</h2>
+        <div class="card" style="padding: 20px; border-left: 4px solid var(--accent-primary);">
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+            <strong>Important Academic Disclaimer:</strong> Automated classification systems should serve as decision-support instruments rather than sole arbiters of truth. Edge cases such as political satire (e.g., <em>The Onion</em>), breaking unconfirmed breaking news, and nuanced editorial commentary require careful human fact-checking. VERIFAI includes user-feedback reporting mechanisms specifically to capture false positive edge cases for model retraining.
+          </p>
+        </div>
+      </section>
+
+      <div class="text-center" style="margin-top: 32px;">
+        <a href="detector.html" class="btn btn-primary btn-lg">Test The Model in Detector &rarr;</a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>&copy; 2026 VERIFAI Project. Academic research and educational demonstration.</span>
+        <span>Built with HTML5, CSS3, & Vanilla JavaScript.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: verifai_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: verifai_db
+      POSTGRES_USER: verifai_user
+      POSTGRES_PASSWORD: verifai_secure_password_2026!
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U verifai_user -d verifai_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: verifai_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=django-insecure-prod-key-verifai-production-deployment-2026!
+      - ALLOWED_HOSTS=localhost,127.0.0.1,web
+      - DATABASE_URL=postgres://verifai_user:verifai_secure_password_2026!@db:5432/verifai_db
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      - ML_MODEL_PATH=/app/fake_news_model.pkl
+      - TFIDF_VECTORIZER_PATH=/app/tfidf_vectorizer.pkl
+    volumes:
+      - ../ml/fake_news_model.pkl:/app/fake_news_model.pkl:ro
+      - ../ml/tfidf_vectorizer.pkl:/app/tfidf_vectorizer.pkl:ro
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

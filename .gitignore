@@ -1,0 +1,91 @@
+# ==============================================================================
+# VERIFAI — Industry Standard .gitignore
+# ==============================================================================
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Django Environment & Secrets
+.env
+.env.local
+*.env
+!.env.example
+!backend/.env.example
+
+# Databases
+*.sqlite3
+db.sqlite3
+
+# Static & Media files
+backend/staticfiles/
+staticfiles/
+media/
+backend/media/
+!media/.gitkeep
+!backend/media/.gitkeep
+
+# Large Dataset Files (>50MB, Kaggle CSVs)
+# Refer to datasets/README.md for download instructions
+ml/Fake.csv
+ml/True.csv
+datasets/*.csv
+datasets/*.xlsx
+datasets/*.xls
+*.tar.gz
+*.zip
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# Build & Packaging
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# OS Specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Temporary files
+scratch/
+tmp/
+temp/

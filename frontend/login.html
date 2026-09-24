@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — VERIFAI</title>
+  <meta name="description" content="Sign in to your VERIFAI account to access verification records and custom audit settings.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="VERIFAI Home">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        <span>VERIFAI</span>
+        <span class="brand-tagline">Detection System</span>
+      </a>
+
+      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav id="navMenu" class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="detector.html" class="nav-link">Detector</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="history.html" class="nav-link">History</a>
+        <a href="methodology.html" class="nav-link">Methodology</a>
+      </nav>
+
+      <div id="navAuthContainer" class="nav-actions">
+        <!-- Dynamic auth state -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Auth Body -->
+  <main class="main-content">
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        
+        <div class="auth-header">
+          <span class="auth-brand-badge">Academic Verification Portal</span>
+          <h1 class="auth-title">Sign In to VERIFAI</h1>
+          <p class="auth-subtitle">Access your verification audit trail and telemetry reports.</p>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+          <div class="form-group">
+            <label class="form-label" for="emailInput">Institutional / Work Email</label>
+            <input type="email" id="emailInput" class="form-input" placeholder="name@university.edu" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <div class="flex items-center justify-between" style="margin-bottom: 4px;">
+              <label class="form-label" for="passwordInput" style="margin-bottom: 0;">Password</label>
+              <a href="#" onclick="showToast('Password recovery link sent to demonstration inbox.', 'info'); return false;" style="font-size: 11px; color: var(--text-muted); text-decoration: underline;">
+                Forgot password?
+              </a>
+            </div>
+            <div class="password-input-wrap">
+              <input type="password" id="passwordInput" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+              <button type="button" id="togglePasswordBtn" class="password-toggle-btn">Show</button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between" style="margin-top: 4px; margin-bottom: 8px;">
+            <label class="checkbox-label">
+              <input type="checkbox" checked>
+              <span>Remember session</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+            Sign In to Workspace
+          </button>
+        </form>
+
+        <!-- Quick Demo Credentials Box for FYP Reviewers -->
+        <div class="demo-credentials-box">
+          <div style="font-weight: 600; margin-bottom: 4px;">Evaluator / Demo Credentials:</div>
+          <div>Email: <code>researcher@verifai.org</code></div>
+          <div style="margin-top: 2px;">Password: <code>VerifAI_2026!Secure</code></div>
+          <button type="button" id="demoFillBtn" class="quick-fill-btn">Click here to auto-fill demo account &rarr;</button>
+        </div>
+
+        <div class="auth-footer-nav">
+          Don't have an account? <a href="signup.html">Create an account</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>&copy; 2026 VERIFAI Project. Academic research and educational demonstration.</span>
+        <span>Built with HTML5, CSS3, & Vanilla JavaScript.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Logs & Verification History — VERIFAI</title>
+  <meta name="description" content="Complete chronological verification records and forensic provenance audit trails.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="VERIFAI Home">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        <span>VERIFAI</span>
+        <span class="brand-tagline">Detection System</span>
+      </a>
+
+      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav id="navMenu" class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="detector.html" class="nav-link">Detector</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="history.html" class="nav-link active">History</a>
+        <a href="methodology.html" class="nav-link">Methodology</a>
+      </nav>
+
+      <div id="navAuthContainer" class="nav-actions">
+        <!-- Dynamic auth state -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content section-sm">
+    <div class="container">
+
+      <!-- History Header -->
+      <div class="flex items-center justify-between flex-wrap gap-md" style="margin-bottom: 24px;">
+        <div>
+          <span class="editorial-eyebrow">Provenance Audit Trail</span>
+          <h1 class="editorial-heading-2" style="margin-top: 4px;">Forensic History & Records</h1>
+          <p class="text-secondary" style="font-size: 14px; margin-top: 4px;">
+            Search and inspect full forensic logs, confidence vectors, and model attribution markers.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-xs flex-wrap">
+          <button id="exportHistoryBtn" class="btn btn-secondary btn-sm" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Export All Records
+          </button>
+          <a href="detector.html" class="btn btn-primary btn-sm">Launch New Scan</a>
+        </div>
+      </div>
+
+      <!-- History Filter and Search Bar -->
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="filter-pills-group">
+            <button class="filter-pill active" data-filter="ALL" type="button">All Items</button>
+            <button class="filter-pill" data-filter="REAL" type="button">Legitimate (Real)</button>
+            <button class="filter-pill" data-filter="FAKE" type="button">Fabricated (Fake)</button>
+            <button class="filter-pill" data-filter="QUESTIONABLE" type="button">Questionable</button>
+          </div>
+
+          <div class="flex items-center gap-xs">
+            <input type="text" id="historySearch" class="form-input table-search-input" placeholder="Search by claim title or ID...">
+            <button id="clearHistoryBtn" class="btn btn-ghost btn-sm" type="button" title="Clear all local history">
+              Clear History
+            </button>
+          </div>
+        </div>
+
+        <!-- History Table -->
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date / Time</th>
+                <th>News Article Snippet</th>
+                <th>Verdict</th>
+                <th>Confidence</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="scanTableBody">
+              <!-- Rendered dynamically by dashboard.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="tableEmptyState" class="empty-state" style="display: none;">
+          <p>No verification entries found.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Inspection Modal for Scan Details -->
+  <div id="scanDetailsModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Verification Audit Record</h3>
+        <button class="modal-close" onclick="closeModal('scanDetailsModal')">&times;</button>
+      </div>
+      <div id="scanDetailsBody" class="modal-body">
+        <!-- Injected dynamically by dashboard.js -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('scanDetailsModal')">Close</button>
+        <a href="detector.html" class="btn btn-primary btn-sm">Open in Detector</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>&copy; 2026 VERIFAI Project. Academic research and educational demonstration.</span>
+        <span>Built with HTML5, CSS3, & Vanilla JavaScript.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

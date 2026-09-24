@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forensic Detector Workbench — VERIFAI</title>
+  <meta name="description" content="Submit article text or news claims to receive an explainable, token-level credibility analysis.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/detector.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="VERIFAI Home">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        <span>VERIFAI</span>
+        <span class="brand-tagline">Detection System</span>
+      </a>
+
+      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav id="navMenu" class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="detector.html" class="nav-link active">Detector</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="history.html" class="nav-link">History</a>
+        <a href="methodology.html" class="nav-link">Methodology</a>
+      </nav>
+
+      <div id="navAuthContainer" class="nav-actions">
+        <!-- Dynamic auth state -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content section-sm">
+    <div class="container">
+
+      <!-- Workbench Title Header -->
+      <div style="margin-bottom: 24px;">
+        <span class="editorial-eyebrow">Natural Language Forensic Workbench</span>
+        <h1 class="editorial-heading-2" style="margin-top: 4px;">Content Verification Workspace</h1>
+        <p class="text-secondary" style="font-size: 14px; margin-top: 4px;">
+          Ingest raw text or choose a benchmark sample below. The ensemble engine will parse syntax, check attribution markers, and compute an explainable credibility report.
+        </p>
+      </div>
+
+      <!-- Main Two-Column Workbench Layout -->
+      <div class="workbench-layout">
+
+        <!-- Left Column: Input Editor -->
+        <div class="workbench-input-card">
+
+          <!-- Workbench Header with Input Mode Tabs -->
+          <div class="workbench-header">
+            <div class="input-tab-group">
+              <button class="input-tab-btn active" data-tab="text" type="button">Raw Article Text</button>
+              <button class="input-tab-btn" data-tab="url" type="button">Headline / Source URL</button>
+            </div>
+
+            <div class="flex items-center gap-xs">
+              <button id="pasteTextBtn" class="btn btn-secondary btn-sm" type="button" title="Paste from clipboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+                Paste
+              </button>
+              <button id="clearTextBtn" class="btn btn-ghost btn-sm" type="button" title="Clear input">
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <!-- Presets Bar for Instant FYP Demonstrations -->
+          <div class="presets-container">
+            <span class="presets-label">Benchmark Presets:</span>
+            <button class="preset-chip chip-fake" data-preset="fake" type="button">
+              <span>&#9888;</span> Fabricated Clickbait
+            </button>
+            <button class="preset-chip chip-real" data-preset="real" type="button">
+              <span>&#10003;</span> Wire Service Report
+            </button>
+            <button class="preset-chip chip-mixed" data-preset="mixed" type="button">
+              <span>&#8226;</span> Ambiguous Municipal
+            </button>
+          </div>
+
+          <!-- URL / Headline Input (Hidden by default) -->
+          <div id="urlInputGroup" style="display: none; padding: 16px 24px; background: var(--bg-subtle); border-bottom: 1px solid var(--border-color);">
+            <label class="form-label" for="urlInput">Target Article URL or Headline</label>
+            <input type="url" id="urlInput" class="form-input" placeholder="https://example.com/news/article-title-slug">
+            <span class="input-helper">The system will scrape and extract the primary text body for forensic tokenization.</span>
+          </div>
+
+          <!-- Editor Body Textarea -->
+          <div class="editor-container">
+            <textarea id="newsTextInput" class="detector-textarea" placeholder="Paste full article text, investigative report excerpt, or breaking news claim here to begin forensic analysis (minimum 8 words)..."></textarea>
+          </div>
+
+          <!-- Workbench Footer Toolbar -->
+          <div class="workbench-footer">
+            <div class="counter-indicators">
+              <span id="wordCount">0 words</span>
+              <span>&bull;</span>
+              <span id="charCount">0 chars</span>
+              <span>&bull;</span>
+              <span style="color: var(--text-muted);">Model: RoBERTa-ISOT-Ensemble</span>
+            </div>
+
+            <button id="analyzeBtn" class="btn btn-primary" type="button" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              Run Forensic Verification
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Verification Results / Progress -->
+        <div class="workbench-results-container">
+
+          <!-- Initial Empty State -->
+          <div id="workbenchEmptyPlaceholder" class="card empty-state">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; color: var(--text-muted);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <circle cx="12" cy="14" r="3"></circle>
+              </svg>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Workbench Awaiting Input</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); max-width: 320px; margin: 0 auto 20px auto; line-height: 1.5;">
+              Load one of the benchmark presets on the left or paste your own article text to run multi-layer linguistic verification.
+            </p>
+            <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-family-mono); background: var(--bg-subtle); padding: 8px 12px; border-radius: 4px; display: inline-block;">
+              Analysis includes: Syntactic entropy &bull; Bias indicators &bull; Attributed sources
+            </div>
+          </div>
+
+          <!-- Multi-Step Scanning Progress Card (Displayed while running) -->
+          <div id="scanProgressCard" class="scan-progress-card">
+            <div class="scanner-spinner"></div>
+            <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Executing Inference Pipeline</h3>
+            <p class="text-secondary" style="font-size: 13px;">Deconstructing linguistic tokens and matching against benchmark corpora...</p>
+
+            <ul class="scan-steps-list">
+              <li id="step1" class="scan-step-item pending">
+                <span>01.</span>
+                <span style="flex:1;">Tokenizing & syntactic tree parsing</span>
+                <span class="step-status text-mono" style="font-size: 11px;">Pending</span>
+              </li>
+              <li id="step2" class="scan-step-item pending">
+                <span>02.</span>
+                <span style="flex:1;">Stylometrics & sentiment polarity</span>
+                <span class="step-status text-mono" style="font-size: 11px;">Pending</span>
+              </li>
+              <li id="step3" class="scan-step-item pending">
+                <span>03.</span>
+                <span style="flex:1;">Ensemble confidence synthesis</span>
+                <span class="step-status text-mono" style="font-size: 11px;">Pending</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Dynamic Verdict Card (Hidden initially, shown when analysis completes) -->
+          <div id="verdictCard" class="verdict-card" style="display: none;">
+
+            <!-- Header Status Banner -->
+            <div id="verdictBanner" class="verdict-header-banner verdict-real">
+              <div>
+                <span style="font-size: 11px; text-transform: uppercase; font-family: var(--font-family-mono); color: var(--text-secondary); display: block; margin-bottom: 4px;">Primary Classification</span>
+                <div id="verdictBadgeText" class="verdict-badge-large">
+                  LIKELY REAL
+                </div>
+              </div>
+
+              <div class="confidence-score-block">
+                <div id="verdictConfidence" class="confidence-number">94.4%</div>
+                <div class="confidence-label">Confidence Score</div>
+              </div>
+            </div>
+
+            <!-- Credibility Score Gauge -->
+            <div class="dimension-section">
+              <div class="flex items-center justify-between" style="margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: 600;">Overall Credibility Index</span>
+                <span id="credibilityScoreText" class="text-mono" style="font-size: 13px; font-weight: 700;">92 / 100</span>
+              </div>
+              <div class="progress-track" style="height: 10px;">
+                <div id="credibilityProgressBar" class="progress-fill progress-fill-real" style="width: 92%;"></div>
+              </div>
+              <span class="input-helper" style="margin-top: 6px; display: block;">Weighted composite score derived from source citations, objectivity, and vocabulary variance.</span>
+            </div>
+
+            <!-- 3 Key Dimension Breakdown -->
+            <div class="dimension-section">
+              <h4 style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary);">Forensic Feature Breakdown</h4>
+              <div class="dimension-list">
+                
+                <div class="dimension-item">
+                  <div class="dimension-meta">
+                    <span class="dimension-name">Sensationalism & Hyperbolic Charge</span>
+                    <span id="valSensationalism" class="dimension-val">6%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div id="meterSensationalism" class="progress-fill progress-fill-fake" style="width: 6%;"></div>
+                  </div>
+                </div>
+
+                <div class="dimension-item">
+                  <div class="dimension-meta">
+                    <span class="dimension-name">Source Attribution & Named Quotations</span>
+                    <span id="valAttribution" class="dimension-val">94%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div id="meterAttribution" class="progress-fill progress-fill-real" style="width: 94%;"></div>
+                  </div>
+                </div>
+
+                <div class="dimension-item">
+                  <div class="dimension-meta">
+                    <span class="dimension-name">Syntactic & Grammatical Cohesion</span>
+                    <span id="valCohesion" class="dimension-val">91%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div id="meterCohesion" class="progress-fill progress-fill-neutral" style="width: 91%;"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Explainable AI (XAI) Token Attribution Viewer -->
+            <div class="dimension-section" style="padding-bottom: 12px;">
+              <div class="flex items-center justify-between" style="margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: 600;">Explainable AI Token Attribution</span>
+                <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-family-mono);">Hover marks for diagnosis</span>
+              </div>
+              <div id="highlightedTextContainer" class="token-highlight-viewer">
+                <!-- Injected dynamically with marked tokens -->
+              </div>
+              <div class="highlight-legend">
+                <div class="legend-item">
+                  <span class="legend-color legend-fake"></span>
+                  <span>Sensational / Clickbait Marker</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color legend-real"></span>
+                  <span>Verified Attribution / Dateline</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Report Actions Bar -->
+            <div class="report-actions-bar">
+              <button id="copyReportBtn" class="btn btn-secondary btn-sm" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy Audit Summary
+              </button>
+
+              <button id="reportFalsePositiveBtn" class="btn btn-ghost btn-sm" type="button" style="color: var(--text-muted);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                  <line x1="4" y1="22" x2="4" y2="15"></line>
+                </svg>
+                Flag Inaccurate Prediction
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Report False Positive Modal -->
+  <div id="reportModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Flag Verification Discrepancy</h3>
+        <button class="modal-close" onclick="closeModal('reportModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Human-in-the-loop feedback is critical for evaluating AI edge cases. Please indicate why you believe this classification was inaccurate.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="reportReason">Feedback Category</label>
+          <select id="reportCategory" class="form-select">
+            <option value="false_positive">False Positive (Genuine article misclassified as Fake)</option>
+            <option value="false_negative">False Negative (Fabricated claim misclassified as Real)</option>
+            <option value="satire">Satirical Content / Parody Misinterpreted</option>
+            <option value="other">Nuanced Contextual Failure</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reportReason">Explanation & Corroborating Source</label>
+          <textarea id="reportReason" class="form-textarea" style="min-height: 90px;" placeholder="Provide verified URLs or cite credible wire coverage (Reuters, AP, FactCheck.org)..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('reportModal')">Cancel</button>
+        <button id="submitReportBtn" class="btn btn-primary btn-sm">Submit to Audit Log</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>&copy; 2026 VERIFAI Project. Academic research and educational demonstration.</span>
+        <span>Built with HTML5, CSS3, & Vanilla JavaScript.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/detector.js"></script>
+</body>
+</html>

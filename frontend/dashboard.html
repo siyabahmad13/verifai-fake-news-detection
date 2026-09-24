@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard & Analytics — VERIFAI</title>
+  <meta name="description" content="View comprehensive metrics, authenticity distribution, and recent verification history.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="VERIFAI Home">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        <span>VERIFAI</span>
+        <span class="brand-tagline">Detection System</span>
+      </a>
+
+      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav id="navMenu" class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="detector.html" class="nav-link">Detector</a>
+        <a href="dashboard.html" class="nav-link active">Dashboard</a>
+        <a href="history.html" class="nav-link">History</a>
+        <a href="methodology.html" class="nav-link">Methodology</a>
+      </nav>
+
+      <div id="navAuthContainer" class="nav-actions">
+        <!-- Dynamic auth state -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content section-sm">
+    <div class="container">
+
+      <!-- Header with Quick Action Bar -->
+      <div class="flex items-center justify-between flex-wrap gap-md" style="margin-bottom: 28px;">
+        <div>
+          <span class="editorial-eyebrow">Auditing & Telemetry</span>
+          <h1 class="editorial-heading-2" style="margin-top: 4px;">System Analytics Dashboard</h1>
+          <p class="text-secondary" style="font-size: 14px; margin-top: 4px;">
+            Aggregated metrics across your local verification session and ingested articles.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-xs flex-wrap">
+          <button id="exportHistoryBtn" class="btn btn-secondary btn-sm" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Export Audit (JSON)
+          </button>
+          <a href="detector.html" class="btn btn-primary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Scan
+          </a>
+        </div>
+      </div>
+
+      <!-- 4 KPI Metrics Grid -->
+      <div class="dashboard-metrics-grid">
+        
+        <!-- Total Scans -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Total Verifications</span>
+            <div class="metric-icon-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div id="metricTotalScans" class="metric-value">5</div>
+          <div class="metric-footer">
+            <span>Inference sessions recorded</span>
+          </div>
+        </div>
+
+        <!-- Detected Legitimate (Real) -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Verified Legitimate</span>
+            <div class="metric-icon-wrap" style="color: var(--status-real);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div id="metricRealScans" class="metric-value" style="color: var(--status-real);">2</div>
+          <div class="metric-footer">
+            <span>Accredited journalism & wire reports</span>
+          </div>
+        </div>
+
+        <!-- Detected Fabrications (Fake) -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Detected Fabrications</span>
+            <div class="metric-icon-wrap" style="color: var(--status-fake);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+            </div>
+          </div>
+          <div id="metricFakeScans" class="metric-value" style="color: var(--status-fake);">2</div>
+          <div class="metric-footer">
+            <span>Clickbait & conspiracy flags</span>
+          </div>
+        </div>
+
+        <!-- Avg Confidence -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Mean Confidence</span>
+            <div class="metric-icon-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </div>
+          </div>
+          <div id="metricAvgConfidence" class="metric-value">90.3%</div>
+          <div class="metric-footer">
+            <span>Model calibration certainty</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Authenticity Distribution Visual Bar -->
+      <div class="distribution-card">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 style="font-size: 15px; font-weight: 600;">Authenticity Breakdown Ratio</h3>
+            <p class="text-muted" style="font-size: 12px; margin-top: 2px;">
+              Proportional distribution of evaluated content across classification categories.
+            </p>
+          </div>
+        </div>
+
+        <!-- Multi-segment visual bar -->
+        <div class="distribution-bar">
+          <div id="distRealSegment" class="distribution-segment-real" style="width: 40%;" title="Real News"></div>
+          <div id="distFakeSegment" class="distribution-segment-fake" style="width: 40%;" title="Fake News"></div>
+          <div id="distWarnSegment" class="distribution-segment-warn" style="width: 20%;" title="Questionable Content"></div>
+        </div>
+
+        <!-- Legend -->
+        <div class="distribution-legend">
+          <div class="legend-stat-group">
+            <span class="status-dot" style="background-color: var(--status-real);"></span>
+            <span style="color: var(--text-secondary);">Real:</span>
+            <span id="legendRealVal" class="legend-stat-val">2 (40%)</span>
+          </div>
+          <div class="legend-stat-group">
+            <span class="status-dot" style="background-color: var(--status-fake);"></span>
+            <span style="color: var(--text-secondary);">Fake:</span>
+            <span id="legendFakeVal" class="legend-stat-val">2 (40%)</span>
+          </div>
+          <div class="legend-stat-group">
+            <span class="status-dot" style="background-color: var(--status-warn);"></span>
+            <span style="color: var(--text-secondary);">Questionable:</span>
+            <span id="legendWarnVal" class="legend-stat-val">1 (20%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Verification Activity Table -->
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="filter-pills-group">
+            <button class="filter-pill active" data-filter="ALL" type="button">All (Total)</button>
+            <button class="filter-pill" data-filter="REAL" type="button">Legitimate</button>
+            <button class="filter-pill" data-filter="FAKE" type="button">Fabricated</button>
+            <button class="filter-pill" data-filter="QUESTIONABLE" type="button">Questionable</button>
+          </div>
+
+          <div class="flex items-center gap-xs">
+            <input type="text" id="historySearch" class="form-input table-search-input" placeholder="Search headline or ID...">
+            <button id="clearHistoryBtn" class="btn btn-ghost btn-sm" type="button" title="Clear table history">
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Article Headline / Claim</th>
+                <th>Classification</th>
+                <th>Confidence</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="scanTableBody">
+              <!-- Dynamically populated by dashboard.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="tableEmptyState" class="empty-state" style="display: none;">
+          <p>No verification records match the active criteria.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Inspection Modal for Scan Details -->
+  <div id="scanDetailsModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Verification Audit Record</h3>
+        <button class="modal-close" onclick="closeModal('scanDetailsModal')">&times;</button>
+      </div>
+      <div id="scanDetailsBody" class="modal-body">
+        <!-- Injected dynamically by dashboard.js -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('scanDetailsModal')">Close</button>
+        <a href="detector.html" class="btn btn-primary btn-sm">Re-Analyze Text</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>&copy; 2026 VERIFAI Project. Academic research and educational demonstration.</span>
+        <span>Built with HTML5, CSS3, & Vanilla JavaScript.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

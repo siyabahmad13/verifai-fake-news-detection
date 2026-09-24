@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VERIFAI — AI-Powered Fake News Detection System</title>
+  <meta name="description" content="A research-grade, explainable AI platform for detecting fabricated claims, sensationalist rhetoric, and unverified digital news.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/detector.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="VERIFAI Home">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        <span>VERIFAI</span>
+        <span class="brand-tagline">Detection System</span>
+      </a>
+
+      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav id="navMenu" class="nav-menu">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="detector.html" class="nav-link">Detector</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="history.html" class="nav-link">History</a>
+        <a href="methodology.html" class="nav-link">Methodology</a>
+      </nav>
+
+      <div id="navAuthContainer" class="nav-actions">
+        <!-- Injected dynamically by app.js (Sign In / User Menu) -->
+        <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
+        <a href="signup.html" class="btn btn-primary btn-sm">Register</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Hero Section -->
+    <section class="section-hero">
+      <div class="container container-narrow text-center">
+        <span class="editorial-eyebrow">Academic Research & Automated Verification</span>
+        <h1 class="editorial-heading-1" style="margin-top: 12px; margin-bottom: 20px;">
+          Linguistic Precision in Misinformation Detection.
+        </h1>
+        <p class="editorial-lead" style="margin-bottom: 32px;">
+          An explainable natural language processing architecture engineered to dissect syntactic anomalies, sensationalist rhetoric, and source attribution across digital news articles.
+        </p>
+
+        <div class="flex items-center justify-center gap-md flex-wrap" style="margin-bottom: 40px;">
+          <a href="detector.html" class="btn btn-primary btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Launch Live Detector
+          </a>
+          <a href="methodology.html" class="btn btn-secondary btn-lg">
+            Explore Methodology
+          </a>
+        </div>
+
+        <div class="flex items-center justify-center gap-lg flex-wrap text-muted" style="font-size: 13px; font-family: var(--font-family-mono);">
+          <span>&bull; Benchmark Accuracy: 94.6%</span>
+          <span>&bull; Validated on ISOT & WELFake</span>
+          <span>&bull; Explainable Token Heatmaps</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Mini-Demo Section -->
+    <section class="section" style="background-color: var(--bg-card); border-bottom: 1px solid var(--border-color);">
+      <div class="container">
+        <div style="max-width: 900px; margin: 0 auto;">
+          <div style="text-align: center; margin-bottom: 28px;">
+            <span class="editorial-eyebrow">Quick Verification Sandbox</span>
+            <h2 class="editorial-heading-2" style="font-size: 24px;">Test The Detection Logic Instantly</h2>
+            <p class="text-secondary" style="font-size: 14px; margin-top: 6px;">
+              Select a benchmark sample below to preview how our multi-dimensional NLP pipeline scores credibility in real-time.
+            </p>
+          </div>
+
+          <!-- Mini Demo Box -->
+          <div class="card" style="padding: 24px; border-color: var(--border-hover);">
+            <div class="flex items-center justify-between flex-wrap gap-sm" style="margin-bottom: 16px;">
+              <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Select Demonstration Claim:</span>
+              <div class="flex gap-xs">
+                <button id="demoBtnFake" class="preset-chip chip-fake" type="button">Sample: Fabricated Clickbait</button>
+                <button id="demoBtnReal" class="preset-chip chip-real" type="button">Sample: Verified Wire Report</button>
+              </div>
+            </div>
+
+            <div id="demoTextPreview" style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-sm); font-size: 14px; line-height: 1.6; color: var(--text-primary); margin-bottom: 18px; min-height: 90px;">
+              "An anonymous whistleblower from an undisclosed military facility has leaked classified documents revealing that scientists created an indestructible miracle fuel pill back in 1984..."
+            </div>
+
+            <div class="flex items-center justify-between flex-wrap gap-md" style="padding-top: 14px; border-top: 1px solid var(--border-color);">
+              <div class="flex items-center gap-md">
+                <div>
+                  <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-family: var(--font-family-mono); display: block;">System Verdict</span>
+                  <span id="demoVerdictBadge" class="badge badge-fake" style="font-size: 13px; padding: 4px 10px; font-weight: 700;">
+                    <span class="status-dot"></span>
+                    LIKELY FAKE
+                  </span>
+                </div>
+                <div style="border-left: 1px solid var(--border-color); padding-left: 16px;">
+                  <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-family: var(--font-family-mono); display: block;">Confidence Level</span>
+                  <span id="demoConfidenceText" style="font-size: 16px; font-weight: 700; font-family: var(--font-family-mono); color: var(--text-primary);">96.8%</span>
+                </div>
+              </div>
+
+              <a href="detector.html" class="btn btn-secondary btn-sm">
+                Open in Full Workbench &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Pillars / Research Modules -->
+    <section class="section">
+      <div class="container">
+        <div style="text-align: center; max-width: 640px; margin: 0 auto 48px auto;">
+          <span class="editorial-eyebrow">Methodological Framework</span>
+          <h2 class="editorial-heading-2">Architected Beyond Black-Box Predictions</h2>
+          <p class="text-secondary" style="margin-top: 8px;">
+            VERIFAI dismantles submitted texts into quantitative linguistic metrics, cross-referencing stylistic traits against validated journalistic criteria.
+          </p>
+        </div>
+
+        <div class="grid grid-3 gap-lg">
+          <!-- Pillar 1 -->
+          <div class="card card-hover">
+            <div class="metric-icon-wrap" style="margin-bottom: 16px; background-color: var(--accent-subtle);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <h3 class="editorial-heading-3" style="font-size: 17px; margin-bottom: 8px;">Stylometric & Affective Analysis</h3>
+            <p class="text-secondary" style="font-size: 14px; line-height: 1.6;">
+              Measures lexical entropy, superlative density, punctuation anomalies, and hyperbolic sentiment shifts typical of clickbait manipulation.
+            </p>
+          </div>
+
+          <!-- Pillar 2 -->
+          <div class="card card-hover">
+            <div class="metric-icon-wrap" style="margin-bottom: 16px; background-color: var(--accent-subtle);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <h3 class="editorial-heading-3" style="font-size: 17px; margin-bottom: 8px;">Provenance & Named Entity Checks</h3>
+            <p class="text-secondary" style="font-size: 14px; line-height: 1.6;">
+              Scans for journalistic attribution markers, recognized news wire datelines (Reuters, AP), and direct quotations from verifiable entities.
+            </p>
+          </div>
+
+          <!-- Pillar 3 -->
+          <div class="card card-hover">
+            <div class="metric-icon-wrap" style="margin-bottom: 16px; background-color: var(--accent-subtle);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </div>
+            <h3 class="editorial-heading-3" style="font-size: 17px; margin-bottom: 8px;">Transparent Token Attribution (XAI)</h3>
+            <p class="text-secondary" style="font-size: 14px; line-height: 1.6;">
+              No opaque predictions. Every scan highlights the specific trigger phrases that contributed to the classification verdict with detailed diagnostic tooltips.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pipeline Architecture Breakdown -->
+    <section class="section" style="background-color: var(--bg-secondary); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+      <div class="container">
+        <div style="text-align: center; max-width: 600px; margin: 0 auto 40px auto;">
+          <span class="editorial-eyebrow">Inference Pipeline</span>
+          <h2 class="editorial-heading-2">How An Article Is Verified</h2>
+          <p class="text-secondary" style="font-size: 14px; margin-top: 6px;">
+            A deterministic four-phase progression from raw text ingestion to explainable forensic scoring.
+          </p>
+        </div>
+
+        <div class="grid grid-4 gap-md">
+          <div class="card" style="background: var(--bg-card); padding: 20px;">
+            <div style="font-family: var(--font-family-mono); font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">STAGE 01</div>
+            <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">Ingestion & Sanitization</h4>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+              Raw text or target URL is normalized, stripping boilerplate HTML, standardizing typography, and computing lexical density.
+            </p>
+          </div>
+
+          <div class="card" style="background: var(--bg-card); padding: 20px;">
+            <div style="font-family: var(--font-family-mono); font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">STAGE 02</div>
+            <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">Feature Vectorization</h4>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+              Extraction of TF-IDF n-grams, readability scores (Flesch-Kincaid), and dependency parse trees to isolate sensationalist tropes.
+            </p>
+          </div>
+
+          <div class="card" style="background: var(--bg-card); padding: 20px;">
+            <div style="font-family: var(--font-family-mono); font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">STAGE 03</div>
+            <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">Ensemble Classification</h4>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+              Neural classification weights calibrated against ISOT & WELFake corpora determine classification probability thresholds.
+            </p>
+          </div>
+
+          <div class="card" style="background: var(--bg-card); padding: 20px;">
+            <div style="font-family: var(--font-family-mono); font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">STAGE 04</div>
+            <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">XAI Token Attribution</h4>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+              Token-level importance weights are projected back onto the original text for transparent review by journalists and researchers.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benchmark Stats Grid -->
+    <section class="section">
+      <div class="container">
+        <div class="grid grid-4 gap-lg text-center">
+          <div class="card" style="padding: 24px;">
+            <div style="font-size: 36px; font-weight: 700; font-family: var(--font-family-mono); color: var(--text-primary);">94.6%</div>
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 6px; letter-spacing: 0.05em;">
+              Validation Accuracy
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">Across 72,000+ benchmark articles</p>
+          </div>
+
+          <div class="card" style="padding: 24px;">
+            <div style="font-size: 36px; font-weight: 700; font-family: var(--font-family-mono); color: var(--text-primary);">0.942</div>
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 6px; letter-spacing: 0.05em;">
+              F1-Score
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">Balanced precision and recall</p>
+          </div>
+
+          <div class="card" style="padding: 24px;">
+            <div style="font-size: 36px; font-weight: 700; font-family: var(--font-family-mono); color: var(--text-primary);">118ms</div>
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 6px; letter-spacing: 0.05em;">
+              Inference Latency
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">Real-time analysis response</p>
+          </div>
+
+          <div class="card" style="padding: 24px;">
+            <div style="font-size: 36px; font-weight: 700; font-family: var(--font-family-mono); color: var(--text-primary);">3 Datasets</div>
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 6px; letter-spacing: 0.05em;">
+              Corpora Training
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">ISOT, LIAR, & WELFake</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Academic Call to Action Banner -->
+    <section class="section-sm" style="background-color: var(--bg-card); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+      <div class="container container-narrow text-center">
+        <span class="editorial-eyebrow">Academic Research Project</span>
+        <h2 class="editorial-heading-2" style="font-size: 26px; margin-top: 8px; margin-bottom: 12px;">
+          Built for Research, Verifiable by Design
+        </h2>
+        <p class="text-secondary" style="font-size: 15px; margin-bottom: 24px;">
+          Developed as a final-year engineering investigation into machine-learning counter-measures for digital disinformation campaigns.
+        </p>
+        <div class="flex items-center justify-center gap-md">
+          <a href="detector.html" class="btn btn-primary">Start Analyzing Content</a>
+          <a href="dashboard.html" class="btn btn-secondary">View Audit Dashboard</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="flex items-center gap-sm" style="margin-bottom: 12px;">
+            <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
+            <strong style="color: var(--text-primary); font-size: 16px;">VERIFAI</strong>
+          </div>
+          <p style="line-height: 1.6; max-width: 340px; margin-bottom: 16px;">
+            An explainable artificial intelligence system designed to analyze and evaluate the credibility of digital news articles and claim statements.
+          </p>
+          <span class="footer-academic-badge">Final Year Project &bull; 2026</span>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Platform</h4>
+          <ul class="footer-links">
+            <li><a href="detector.html">Live Detector</a></li>
+            <li><a href="dashboard.html">Analytics Dashboard</a></li>
+            <li><a href="history.html">Audit History</a></li>
+            <li><a href="methodology.html">Methodology & Datasets</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Research</h4>
+          <ul class="footer-links">
+            <li><a href="methodology.html#datasets">ISOT Benchmark</a></li>
+            <li><a href="methodology.html#architecture">NLP Pipeline</a></li>
+            <li><a href="methodology.html#xai">Explainable AI (XAI)</a></li>
+            <li><a href="methodology.html#ethics">Ethics & Limitations</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Account</h4>
+          <ul class="footer-links">
+            <li><a href="login.html">Sign In</a></li>
+            <li><a href="signup.html">Create Account</a></li>
+            <li><a href="login.html">Demo Credentials</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 VERIFAI Project. Academic research and educational demonstration.</span>
+        <span>Built with HTML5, CSS3, & Vanilla JavaScript.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    // Quick landing page interactive mini-demo toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const demoBtnFake = document.getElementById('demoBtnFake');
+      const demoBtnReal = document.getElementById('demoBtnReal');
+      const preview = document.getElementById('demoTextPreview');
+      const badge = document.getElementById('demoVerdictBadge');
+      const conf = document.getElementById('demoConfidenceText');
+
+      demoBtnFake?.addEventListener('click', () => {
+        preview.textContent = '"An anonymous whistleblower from an undisclosed military facility has leaked classified documents revealing that scientists created an indestructible miracle fuel pill back in 1984..."';
+        badge.className = 'badge badge-fake';
+        badge.innerHTML = '<span class="status-dot"></span> LIKELY FAKE';
+        conf.textContent = '96.8%';
+      });
+
+      demoBtnReal?.addEventListener('click', () => {
+        preview.textContent = '"PARIS (Reuters) — The European Space Agency successfully launched its Earth observation satellite Biomass aboard a Vega-C rocket from the Kourou spaceport in French Guiana early on Thursday..."';
+        badge.className = 'badge badge-real';
+        badge.innerHTML = '<span class="status-dot"></span> LIKELY REAL';
+        conf.textContent = '94.4%';
+      });
+    });
+  </script>
+</body>
+</html>
