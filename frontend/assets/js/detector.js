@@ -1,6 +1,7 @@
 /**
  * VerifAI — News Test Controller
- * Handles article submission, ML inference via Django API, and persistent result presentation.
+ * Handles article submission, loading feedback, ML inference via Django API,
+ * dynamic explanations, and persistent result presentation.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,14 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
 let activePredictionRecord = null;
 
 function initDetector() {
-  const form = document.getElementById('newsTestForm');
   const articleTextInput = document.getElementById('articleTextInput');
   const charWordCounter = document.getElementById('charWordCounter');
   const clearInputBtn = document.getElementById('clearInputBtn');
   const analyzeBtn = document.getElementById('analyzeBtn');
+  const loadingCard = document.getElementById('loadingCard');
   const resultCard = document.getElementById('resultCard');
   const verdictBadge = document.getElementById('verdictBadge');
   const confidenceVal = document.getElementById('confidenceVal');
+  const explanationText = document.getElementById('explanationText');
 
   const openFeedbackModalBtn = document.getElementById('openFeedbackModalBtn');
   const feedbackModal = document.getElementById('feedbackModal');
@@ -41,6 +43,7 @@ function initDetector() {
     e.preventDefault();
     if (articleTextInput) articleTextInput.value = '';
     updateCounts();
+    if (loadingCard) loadingCard.style.display = 'none';
     if (resultCard) resultCard.style.display = 'none';
     activePredictionRecord = null;
     articleTextInput?.focus();
@@ -61,11 +64,18 @@ function initDetector() {
       return;
     }
 
-    // Indicate loading state on button without hiding the previous result prematurely
-    analyzeBtn.disabled = true;
-    analyzeBtn.textContent = 'Analyzing...';
+    // 1. Immediately activate analysis loading state
+    if (analyzeBtn) {
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = 'Analyzing...';
+    }
+
+    // Hide any previous result and display the subtle loading indicator
+    if (resultCard) resultCard.style.display = 'none';
+    if (loadingCard) loadingCard.style.display = 'flex';
 
     try {
+      // 2. Query Django prediction API
       const res = await window.VerifaiAPI.predictText(text);
       const data = res?.data;
 
@@ -73,35 +83,50 @@ function initDetector() {
         throw new Error('Prediction API returned an empty response.');
       }
 
-      // Update active state
       activePredictionRecord = data;
 
-      // Render Result permanently in UI
+      // 3. Remove loading state and display persistent result
+      if (loadingCard) loadingCard.style.display = 'none';
       renderResult(data);
+
     } catch (err) {
+      if (loadingCard) loadingCard.style.display = 'none';
       showToast(err.message || 'Analysis failed. Please check backend connection.', 'error');
     } finally {
-      analyzeBtn.disabled = false;
-      analyzeBtn.textContent = 'Analyze News';
+      if (analyzeBtn) {
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'Analyze News';
+      }
     }
   }
 
-  // Intercept form submit and button click
-  form?.addEventListener('submit', performAnalysis);
+  // Intercept analyze button click
   analyzeBtn?.addEventListener('click', performAnalysis);
 
-  // Render Result in UI - NEVER hides until manually cleared or new analysis completes
+  // Render Result in UI - Stays permanently until next analysis or user clicks Clear
   function renderResult(data) {
-    if (!resultCard || !verdictBadge || !confidenceVal) return;
+    if (!resultCard || !verdictBadge || !confidenceVal || !explanationText) return;
 
     const isReal = (data.prediction || '').toLowerCase() === 'real';
 
+    // 1. Prediction Verdict Badge
     verdictBadge.className = `verdict-badge ${isReal ? 'real' : 'fake'}`;
     verdictBadge.textContent = isReal ? 'REAL' : 'FAKE';
 
+    // 2. Confidence Metric
     const confNum = Number(data.confidence) || 0;
     confidenceVal.textContent = `${confNum.toFixed(1)}%`;
 
+    // 3. "Why this result?" Contextual Explanation
+    if (isReal) {
+      explanationText.textContent = 
+        'This article was classified as Real because the language and text patterns in the submitted content were more similar to patterns learned from real-news examples in the training data.';
+    } else {
+      explanationText.textContent = 
+        'This article was classified as Fake because the language and text patterns in the submitted content were more similar to patterns learned from fake-news examples in the training data.';
+    }
+
+    // 4. Reveal Result Card
     resultCard.style.display = 'block';
   }
 
