@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Audit Logs & Verification History — VERIFAI</title>
   <meta name="description" content="Complete chronological verification records and forensic provenance audit trails.">
+  <!-- Authentication Route Guard -->
+  <script>
+    (function() {
+      var user = localStorage.getItem('verifai_mock_user') || localStorage.getItem('verifai_access_token') || localStorage.getItem('verifai_user');
+      if (!user) {
+        window.location.replace('login.html?redirect=history.html&auth=required');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="assets/css/main.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">

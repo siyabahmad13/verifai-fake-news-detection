@@ -138,3 +138,33 @@
   font-weight: var(--font-weight-semibold);
   text-decoration: underline;
 }
+
+/* Authentication Required Alert Banner */
+.auth-alert {
+  background-color: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.28);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: var(--space-lg);
+  font-size: var(--font-size-xs);
+  color: #991B1B;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.auth-alert-icon {
+  flex-shrink: 0;
+  color: #DC2626;
+  margin-top: 1px;
+}
+
+.auth-alert-title {
+  font-weight: 600;
+  color: #991B1B;
+  display: block;
+  margin-bottom: 2px;
+}
+

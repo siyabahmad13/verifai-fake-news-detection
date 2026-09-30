@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Dashboard & Analytics — VERIFAI</title>
   <meta name="description" content="View comprehensive metrics, authenticity distribution, and recent verification history.">
+  <!-- Authentication Route Guard -->
+  <script>
+    (function() {
+      var user = localStorage.getItem('verifai_mock_user') || localStorage.getItem('verifai_access_token') || localStorage.getItem('verifai_user');
+      if (!user) {
+        window.location.replace('login.html?redirect=dashboard.html&auth=required');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="assets/css/main.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">

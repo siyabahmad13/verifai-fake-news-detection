@@ -37,7 +37,43 @@ function initNavigation() {
       link.classList.remove('active');
     }
   });
+
+  // Protected Route Interceptor: Block unauthenticated clicks on detector/dashboard/history
+  document.addEventListener('click', (e) => {
+    const anchor = e.target.closest('a');
+    if (!anchor) return;
+
+    const href = anchor.getAttribute('href');
+    if (!href) return;
+
+    // Check if target points to a protected route
+    const protectedPages = ['detector.html', 'dashboard.html', 'history.html'];
+    const matched = protectedPages.find(page => {
+      return href === page || href.endsWith('/' + page) || href.startsWith(page + '?') || href.startsWith(page + '#');
+    });
+
+    if (matched && !isAuthenticated()) {
+      e.preventDefault();
+      showToast('Please sign in or register to access this section.', 'info');
+      setTimeout(() => {
+        window.location.href = `login.html?redirect=${encodeURIComponent(matched)}&auth=required`;
+      }, 250);
+    }
+  });
 }
+
+/**
+ * Check if the user has an active session (mock session, JWT token, or user object)
+ */
+function isAuthenticated() {
+  return !!(
+    localStorage.getItem(AUTH_STORAGE_KEY) ||
+    localStorage.getItem('verifai_access_token') ||
+    localStorage.getItem('verifai_user')
+  );
+}
+
+window.isAuthenticated = isAuthenticated;
 
 /* ==========================================================================
    Toast Notifications System
@@ -136,6 +172,9 @@ function setMockUser(user) {
 
 function clearMockUser() {
   localStorage.removeItem(AUTH_STORAGE_KEY);
+  localStorage.removeItem('verifai_access_token');
+  localStorage.removeItem('verifai_refresh_token');
+  localStorage.removeItem('verifai_user');
   initAuthUI();
 }
 
@@ -164,10 +203,12 @@ function initAuthUI() {
       clearMockUser();
       showToast('You have signed out successfully.', 'info');
       setTimeout(() => {
-        if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('history.html')) {
+        const currentPath = window.location.pathname.split('/').pop() || '';
+        const protectedPages = ['detector.html', 'dashboard.html', 'history.html'];
+        if (protectedPages.includes(currentPath)) {
           window.location.href = 'index.html';
         }
-      }, 600);
+      }, 400);
     });
   } else {
     authContainer.innerHTML = `

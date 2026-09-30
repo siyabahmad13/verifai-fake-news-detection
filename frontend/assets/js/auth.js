@@ -1,11 +1,66 @@
-/**
- * VERIFAI — Authentication Controller (Mock Auth & Form Validation)
+﻿/**
+ * VERIFAI — Authentication Controller (Mock Auth, Form Validation & Route Protection)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // If already authenticated, redirect to destination
+  if (window.isAuthenticated && window.isAuthenticated()) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectTarget = urlParams.get('redirect');
+    const validTargets = ['detector.html', 'dashboard.html', 'history.html'];
+    const destination = (redirectTarget && validTargets.includes(redirectTarget)) ? redirectTarget : 'dashboard.html';
+    window.location.replace(destination);
+    return;
+  }
+
+  checkRedirectParams();
   initLoginForm();
   initSignupForm();
 });
+
+/**
+ * Handle incoming redirect queries and display notification banners if access was restricted
+ */
+function checkRedirectParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirectTarget = urlParams.get('redirect');
+  const isAuthRequired = urlParams.get('auth') === 'required';
+  const alertEl = document.getElementById('authRequiredAlert');
+  const alertText = document.getElementById('authAlertText');
+
+  if ((isAuthRequired || redirectTarget) && alertEl) {
+    alertEl.style.display = 'flex';
+    if (alertText && redirectTarget) {
+      const pageNames = {
+        'detector.html': 'Forensic Detector Workbench',
+        'dashboard.html': 'Analytics Dashboard',
+        'history.html': 'Verification Audit History'
+      };
+      const pageTitle = pageNames[redirectTarget] || 'Protected Workspace';
+      alertText.textContent = `Please sign in or create an account to access the ${pageTitle}.`;
+    }
+  }
+
+  // Update cross-links between Login and Signup to preserve destination
+  if (redirectTarget) {
+    const signupLinks = document.querySelectorAll('a[href^="signup.html"]');
+    signupLinks.forEach(link => {
+      link.href = `signup.html?redirect=${encodeURIComponent(redirectTarget)}&auth=required`;
+    });
+
+    const loginLinks = document.querySelectorAll('a[href^="login.html"]');
+    loginLinks.forEach(link => {
+      link.href = `login.html?redirect=${encodeURIComponent(redirectTarget)}&auth=required`;
+    });
+  }
+}
+
+function getSafeRedirectDestination() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirectTarget = urlParams.get('redirect');
+  const validTargets = ['detector.html', 'dashboard.html', 'history.html'];
+  return (redirectTarget && validTargets.includes(redirectTarget)) ? redirectTarget : 'dashboard.html';
+}
 
 function initLoginForm() {
   const loginForm = document.getElementById('loginForm');
@@ -29,7 +84,7 @@ function initLoginForm() {
   });
 
   // Handle Login Submit
-  loginForm?.addEventListener('submit', (e) => {
+  loginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('emailInput')?.value.trim();
     const password = passwordInput?.value;
@@ -39,7 +94,17 @@ function initLoginForm() {
       return;
     }
 
-    // Mock successful authentication
+    // Attempt backend API login if available
+    if (window.VerifaiAPI && typeof window.VerifaiAPI.login === 'function') {
+      try {
+        await window.VerifaiAPI.login(email, password);
+      } catch (err) {
+        // Fallback to client mock session if backend is offline
+        console.warn('Backend login fallback to local session:', err.message);
+      }
+    }
+
+    // Set local session
     const user = {
       name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
       email: email,
@@ -51,9 +116,10 @@ function initLoginForm() {
     setMockUser(user);
     showToast(`Welcome back, ${user.name}!`, 'success');
 
+    const destination = getSafeRedirectDestination();
     setTimeout(() => {
-      window.location.href = 'dashboard.html';
-    }, 600);
+      window.location.href = destination;
+    }, 450);
   });
 }
 
@@ -77,7 +143,7 @@ function initSignupForm() {
   });
 
   // Handle Signup Submit
-  signupForm?.addEventListener('submit', (e) => {
+  signupForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('signupName')?.value.trim();
     const email = document.getElementById('signupEmail')?.value.trim();
@@ -106,6 +172,21 @@ function initSignupForm() {
       return;
     }
 
+    // Attempt backend registration if API available
+    if (window.VerifaiAPI && typeof window.VerifaiAPI.register === 'function') {
+      try {
+        await window.VerifaiAPI.register({
+          username: email.split('@')[0],
+          email: email,
+          password: password,
+          first_name: name.split(' ')[0] || '',
+          last_name: name.split(' ').slice(1).join(' ') || ''
+        });
+      } catch (err) {
+        console.warn('Backend register fallback to local session:', err.message);
+      }
+    }
+
     const user = {
       name: name,
       email: email,
@@ -117,9 +198,10 @@ function initSignupForm() {
     setMockUser(user);
     showToast('Account registered successfully!', 'success');
 
+    const destination = getSafeRedirectDestination();
     setTimeout(() => {
-      window.location.href = 'dashboard.html';
-    }, 700);
+      window.location.href = destination;
+    }, 550);
   });
 }
 

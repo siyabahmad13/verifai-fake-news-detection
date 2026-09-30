@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Forensic Detector Workbench — VERIFAI</title>
   <meta name="description" content="Submit article text or news claims to receive an explainable, token-level credibility analysis.">
+  <!-- Authentication Route Guard -->
+  <script>
+    (function() {
+      var user = localStorage.getItem('verifai_mock_user') || localStorage.getItem('verifai_access_token') || localStorage.getItem('verifai_user');
+      if (!user) {
+        window.location.replace('login.html?redirect=detector.html&auth=required');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="assets/css/main.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/detector.css">

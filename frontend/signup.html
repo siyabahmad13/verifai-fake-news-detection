@@ -56,6 +56,18 @@
           <p class="auth-subtitle">Equip your fact-checking workflows with explainable machine learning.</p>
         </div>
 
+        <!-- Authentication Required Banner -->
+        <div id="authRequiredAlert" class="auth-alert" style="display: none;">
+          <svg class="auth-alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <div>
+            <span class="auth-alert-title">Authentication Required</span>
+            <span id="authAlertText">Please create an account or sign in to access the verification workbench and dashboard.</span>
+          </div>
+        </div>
+
         <form id="signupForm" class="auth-form">
           <div class="form-group">
             <label class="form-label" for="signupName">Full Name *</label>
