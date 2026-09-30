@@ -1,154 +1,264 @@
 /**
- * VerifAI — News Test Controller
- * Handles article submission, loading feedback, ML inference via Django API,
- * dynamic explanations, and persistent result presentation.
+ * VerifAI — News Test Controller (Rebuilt from scratch)
+ * Single, deterministic event flow for ML news classification.
+ * Completely independent, eliminates all disappearing-result bugs.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initDetector();
+  initNewsTest();
 });
 
-let activePredictionRecord = null;
-
-function initDetector() {
-  const articleTextInput = document.getElementById('articleTextInput');
-  const charWordCounter = document.getElementById('charWordCounter');
-  const clearInputBtn = document.getElementById('clearInputBtn');
+function initNewsTest() {
+  // DOM Elements
+  const articleInput = document.getElementById('articleTextInput');
+  const charCounter = document.getElementById('charCounter');
+  const validationMsg = document.getElementById('validationMsg');
   const analyzeBtn = document.getElementById('analyzeBtn');
-  const loadingCard = document.getElementById('loadingCard');
-  const resultCard = document.getElementById('resultCard');
-  const verdictBadge = document.getElementById('verdictBadge');
-  const confidenceVal = document.getElementById('confidenceVal');
-  const explanationText = document.getElementById('explanationText');
+  const clearBtn = document.getElementById('clearBtn');
 
-  const openFeedbackModalBtn = document.getElementById('openFeedbackModalBtn');
+  const loadingSection = document.getElementById('loadingSection');
+  const loadingStepText = document.getElementById('loadingStepText');
+
+  const resultSection = document.getElementById('resultSection');
+  const verdictBadge = document.getElementById('verdictBadge');
+  const confidenceValue = document.getElementById('confidenceValue');
+  const confidenceFill = document.getElementById('confidenceFill');
+  const whyResultText = document.getElementById('whyResultText');
+
+  const errorSection = document.getElementById('errorSection');
+  const errorMessage = document.getElementById('errorMessage');
+
+  const openFeedbackBtn = document.getElementById('openFeedbackBtn');
   const feedbackModal = document.getElementById('feedbackModal');
   const closeFeedbackModalBtn = document.getElementById('closeFeedbackModalBtn');
   const cancelFeedbackBtn = document.getElementById('cancelFeedbackBtn');
   const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
 
-  // Word & Character Counter
-  const updateCounts = () => {
-    if (!articleTextInput || !charWordCounter) return;
-    const text = articleTextInput.value.trim();
-    const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
-    const chars = articleTextInput.value.length;
-    charWordCounter.textContent = `${words} words • ${chars} characters`;
-  };
+  // Internal State
+  let isAnalyzing = false;
+  let activePredictionId = null;
+  let stepTimer = null;
 
-  articleTextInput?.addEventListener('input', updateCounts);
+  const ANALYSIS_STEPS = [
+    'Reading article content...',
+    'Analyzing language patterns...',
+    'Comparing learned patterns...',
+    'Preparing prediction...'
+  ];
 
-  // Clear Input Button
-  clearInputBtn?.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (articleTextInput) articleTextInput.value = '';
-    updateCounts();
-    if (loadingCard) loadingCard.style.display = 'none';
-    if (resultCard) resultCard.style.display = 'none';
-    activePredictionRecord = null;
-    articleTextInput?.focus();
+  // 1. Character Counter
+  function updateCharacterCount() {
+    if (!articleInput || !charCounter) return;
+    const count = articleInput.value.length;
+    charCounter.textContent = `${count} character${count === 1 ? '' : 's'}`;
+  }
+
+  articleInput?.addEventListener('input', () => {
+    updateCharacterCount();
+    if (validationMsg && validationMsg.style.display !== 'none') {
+      validationMsg.style.display = 'none';
+      validationMsg.textContent = '';
+    }
   });
 
-  // Core Analysis Submission Function
-  async function performAnalysis(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
+  // 2. Clear Action
+  clearBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (isAnalyzing) return;
+
+    if (articleInput) articleInput.value = '';
+    updateCharacterCount();
+
+    if (validationMsg) {
+      validationMsg.style.display = 'none';
+      validationMsg.textContent = '';
     }
 
-    const text = articleTextInput?.value.trim() || '';
+    stopStepAnimation();
+    if (loadingSection) loadingSection.style.display = 'none';
+    if (resultSection) resultSection.style.display = 'none';
+    if (confidenceFill) confidenceFill.style.width = '0%';
+    if (errorSection) errorSection.style.display = 'none';
 
+    activePredictionId = null;
+    articleInput?.focus();
+  });
+
+  // 3. Step Message Animation
+  function startStepAnimation() {
+    stopStepAnimation();
+    let currentStep = 0;
+    if (loadingStepText) {
+      loadingStepText.textContent = ANALYSIS_STEPS[0];
+    }
+
+    stepTimer = setInterval(() => {
+      currentStep++;
+      if (currentStep < ANALYSIS_STEPS.length) {
+        if (loadingStepText) {
+          loadingStepText.textContent = ANALYSIS_STEPS[currentStep];
+        }
+      } else {
+        clearInterval(stepTimer);
+        stepTimer = null;
+      }
+    }, 400);
+  }
+
+  function stopStepAnimation() {
+    if (stepTimer) {
+      clearInterval(stepTimer);
+      stepTimer = null;
+    }
+  }
+
+  // 4. Primary Analysis Execution
+  async function runAnalysis() {
+    if (isAnalyzing) return;
+
+    const text = articleInput?.value.trim() || '';
+
+    // Validation
     if (!text || text.length < 15) {
-      showToast('Please enter at least 15 characters of article text.', 'error');
-      articleTextInput?.focus();
+      if (validationMsg) {
+        validationMsg.textContent = 'Please enter at least 15 characters of article text.';
+        validationMsg.style.display = 'block';
+      }
+      articleInput?.focus();
       return;
     }
 
-    // 1. Immediately activate analysis loading state
+    // Reset previous outcome states
+    if (validationMsg) validationMsg.style.display = 'none';
+    if (resultSection) resultSection.style.display = 'none';
+    if (errorSection) errorSection.style.display = 'none';
+    if (confidenceFill) confidenceFill.style.width = '0%';
+
+    // Engage analyzing state
+    isAnalyzing = true;
     if (analyzeBtn) {
       analyzeBtn.disabled = true;
       analyzeBtn.textContent = 'Analyzing...';
     }
+    if (clearBtn) {
+      clearBtn.disabled = true;
+    }
 
-    // Hide any previous result and display the subtle loading indicator
-    if (resultCard) resultCard.style.display = 'none';
-    if (loadingCard) loadingCard.style.display = 'flex';
+    // Show loading state and begin steps
+    if (loadingSection) loadingSection.style.display = 'block';
+    startStepAnimation();
+
+    // Natural step pacing combined with live Django ML inference
+    const minStepDelay = new Promise((resolve) => setTimeout(resolve, 1400));
+    const apiCall = window.VerifaiAPI.predictText(text);
 
     try {
-      // 2. Query Django prediction API
-      const res = await window.VerifaiAPI.predictText(text);
-      const data = res?.data;
+      const [_, response] = await Promise.all([minStepDelay, apiCall]);
+      const data = response?.data;
 
-      if (!data) {
-        throw new Error('Prediction API returned an empty response.');
+      if (!data || !data.prediction) {
+        throw new Error('Prediction service returned an incomplete response.');
       }
 
-      activePredictionRecord = data;
+      // Hide loading state
+      stopStepAnimation();
+      if (loadingSection) loadingSection.style.display = 'none';
 
-      // 3. Remove loading state and display persistent result
-      if (loadingCard) loadingCard.style.display = 'none';
+      // Render persistent result
       renderResult(data);
 
     } catch (err) {
-      if (loadingCard) loadingCard.style.display = 'none';
-      showToast(err.message || 'Analysis failed. Please check backend connection.', 'error');
+      stopStepAnimation();
+      if (loadingSection) loadingSection.style.display = 'none';
+
+      // Display clean error state
+      if (errorSection) {
+        if (errorMessage) {
+          errorMessage.textContent = err.message || 'Please check your connection and try again.';
+        }
+        errorSection.style.display = 'block';
+      }
     } finally {
+      // Re-enable controls
+      isAnalyzing = false;
       if (analyzeBtn) {
         analyzeBtn.disabled = false;
         analyzeBtn.textContent = 'Analyze News';
       }
+      if (clearBtn) {
+        clearBtn.disabled = false;
+      }
     }
   }
 
-  // Intercept analyze button click
-  analyzeBtn?.addEventListener('click', performAnalysis);
+  // Single click listener on Analyze button
+  analyzeBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    runAnalysis();
+  });
 
-  // Render Result in UI - Stays permanently until next analysis or user clicks Clear
+  // 5. Render Result (Permanently visible until next analysis or user clicks Clear)
   function renderResult(data) {
-    if (!resultCard || !verdictBadge || !confidenceVal || !explanationText) return;
+    if (!resultSection) return;
+
+    activePredictionId = data.prediction_id || null;
 
     const isReal = (data.prediction || '').toLowerCase() === 'real';
 
-    // 1. Prediction Verdict Badge
-    verdictBadge.className = `verdict-badge ${isReal ? 'real' : 'fake'}`;
-    verdictBadge.textContent = isReal ? 'REAL' : 'FAKE';
-
-    // 2. Confidence Metric
-    const confNum = Number(data.confidence) || 0;
-    confidenceVal.textContent = `${confNum.toFixed(1)}%`;
-
-    // 3. "Why this result?" Contextual Explanation
-    if (isReal) {
-      explanationText.textContent = 
-        'This article was classified as Real because the language and text patterns in the submitted content were more similar to patterns learned from real-news examples in the training data.';
-    } else {
-      explanationText.textContent = 
-        'This article was classified as Fake because the language and text patterns in the submitted content were more similar to patterns learned from fake-news examples in the training data.';
+    // 1. Verdict Badge
+    if (verdictBadge) {
+      verdictBadge.className = `verdict-badge ${isReal ? 'real' : 'fake'}`;
+      verdictBadge.textContent = isReal ? 'REAL' : 'FAKE';
     }
 
-    // 4. Reveal Result Card
-    resultCard.style.display = 'block';
+    // 2. Confidence Metric
+    const confVal = Math.max(0, Math.min(100, Number(data.confidence) || 0));
+    if (confidenceValue) {
+      confidenceValue.textContent = `${confVal.toFixed(1)}%`;
+    }
+
+    // 3. Why this result? — Factual explanation based on model training data
+    if (whyResultText) {
+      if (isReal) {
+        whyResultText.textContent =
+          'The submitted text contains language and patterns that were more similar to real-news examples learned during model training.';
+      } else {
+        whyResultText.textContent =
+          'The submitted text contains language and patterns that were more similar to fake-news examples learned during model training.';
+      }
+    }
+
+    // 4. Reveal Result Section
+    resultSection.style.display = 'block';
+
+    // 5. Animate Horizontal Confidence Progress Bar
+    if (confidenceFill) {
+      confidenceFill.style.width = '0%';
+      requestAnimationFrame(() => {
+        confidenceFill.style.width = `${confVal.toFixed(1)}%`;
+      });
+    }
   }
 
-  // Feedback Modal Handlers
-  openFeedbackModalBtn?.addEventListener('click', (e) => {
+  // 6. Feedback Modal Handlers (Discrepancy Reporting)
+  openFeedbackBtn?.addEventListener('click', (e) => {
     e.preventDefault();
     if (feedbackModal) feedbackModal.classList.add('open');
   });
 
-  const closeFeedback = (e) => {
+  const closeFeedbackModal = (e) => {
     if (e) e.preventDefault();
     if (feedbackModal) feedbackModal.classList.remove('open');
   };
 
-  closeFeedbackModalBtn?.addEventListener('click', closeFeedback);
-  cancelFeedbackBtn?.addEventListener('click', closeFeedback);
+  closeFeedbackModalBtn?.addEventListener('click', closeFeedbackModal);
+  cancelFeedbackBtn?.addEventListener('click', closeFeedbackModal);
 
   submitFeedbackBtn?.addEventListener('click', async (e) => {
-    if (e) e.preventDefault();
-    if (!activePredictionRecord || !activePredictionRecord.prediction_id) {
+    e.preventDefault();
+    if (!activePredictionId) {
       showToast('No active prediction to report.', 'error');
-      closeFeedback();
+      closeFeedbackModal();
       return;
     }
 
@@ -159,13 +269,9 @@ function initDetector() {
     submitFeedbackBtn.textContent = 'Submitting...';
 
     try {
-      await window.VerifaiAPI.submitFeedback(
-        activePredictionRecord.prediction_id,
-        actualLabel,
-        comment
-      );
+      await window.VerifaiAPI.submitFeedback(activePredictionId, actualLabel, comment);
       showToast('Report submitted successfully.', 'success');
-      closeFeedback();
+      closeFeedbackModal();
       const commentInput = document.getElementById('feedbackComment');
       if (commentInput) commentInput.value = '';
     } catch (err) {
