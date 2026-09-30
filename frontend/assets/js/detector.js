@@ -1,7 +1,12 @@
 /**
- * VerifAI — News Test Controller (Rebuilt from scratch)
- * Single, deterministic event flow for ML news classification.
- * Completely independent, eliminates all disappearing-result bugs.
+ * VerifAI — News Test Controller
+ * Persistent, tab-switching resistant state machine for ML news classification.
+ * 
+ * States:
+ *   INITIAL   → User inputs news text
+ *   ANALYZING → Live backend ML inference with dynamic step indicators
+ *   RESULT    → Permanent result presentation (survives tab switches, blur, window minimization)
+ *               Only cleared when the user explicitly clicks "Try New News".
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,6 +29,7 @@ function initNewsTest() {
   const confidenceValue = document.getElementById('confidenceValue');
   const confidenceFill = document.getElementById('confidenceFill');
   const whyResultText = document.getElementById('whyResultText');
+  const tryNewNewsBtn = document.getElementById('tryNewNewsBtn');
 
   const errorSection = document.getElementById('errorSection');
   const errorMessage = document.getElementById('errorMessage');
@@ -39,12 +45,40 @@ function initNewsTest() {
   let activePredictionId = null;
   let stepTimer = null;
 
+  const STORAGE_KEY = 'verifai_news_test_state';
+
   const ANALYSIS_STEPS = [
     'Reading article content...',
     'Analyzing language patterns...',
     'Comparing learned patterns...',
     'Preparing prediction...'
   ];
+
+  // Storage Helpers for persistent result survival across tab discarding/reloads
+  function saveState(data, text) {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+        data,
+        text,
+        savedAt: Date.now()
+      }));
+    } catch (e) {}
+  }
+
+  function getSavedState() {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function clearSavedState() {
+    try {
+      sessionStorage.removeItem(STORAGE_KEY);
+    } catch (e) {}
+  }
 
   // 1. Character Counter
   function updateCharacterCount() {
@@ -61,30 +95,7 @@ function initNewsTest() {
     }
   });
 
-  // 2. Clear Action
-  clearBtn?.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (isAnalyzing) return;
-
-    if (articleInput) articleInput.value = '';
-    updateCharacterCount();
-
-    if (validationMsg) {
-      validationMsg.style.display = 'none';
-      validationMsg.textContent = '';
-    }
-
-    stopStepAnimation();
-    if (loadingSection) loadingSection.style.display = 'none';
-    if (resultSection) resultSection.style.display = 'none';
-    if (confidenceFill) confidenceFill.style.width = '0%';
-    if (errorSection) errorSection.style.display = 'none';
-
-    activePredictionId = null;
-    articleInput?.focus();
-  });
-
-  // 3. Step Message Animation
+  // 2. Loading Step Messages
   function startStepAnimation() {
     stopStepAnimation();
     let currentStep = 0;
@@ -112,97 +123,11 @@ function initNewsTest() {
     }
   }
 
-  // 4. Primary Analysis Execution
-  async function runAnalysis() {
-    if (isAnalyzing) return;
-
-    const text = articleInput?.value.trim() || '';
-
-    // Validation
-    if (!text || text.length < 15) {
-      if (validationMsg) {
-        validationMsg.textContent = 'Please enter at least 15 characters of article text.';
-        validationMsg.style.display = 'block';
-      }
-      articleInput?.focus();
-      return;
-    }
-
-    // Reset previous outcome states
-    if (validationMsg) validationMsg.style.display = 'none';
-    if (resultSection) resultSection.style.display = 'none';
-    if (errorSection) errorSection.style.display = 'none';
-    if (confidenceFill) confidenceFill.style.width = '0%';
-
-    // Engage analyzing state
-    isAnalyzing = true;
-    if (analyzeBtn) {
-      analyzeBtn.disabled = true;
-      analyzeBtn.textContent = 'Analyzing...';
-    }
-    if (clearBtn) {
-      clearBtn.disabled = true;
-    }
-
-    // Show loading state and begin steps
-    if (loadingSection) loadingSection.style.display = 'block';
-    startStepAnimation();
-
-    // Natural step pacing combined with live Django ML inference
-    const minStepDelay = new Promise((resolve) => setTimeout(resolve, 1400));
-    const apiCall = window.VerifaiAPI.predictText(text);
-
-    try {
-      const [_, response] = await Promise.all([minStepDelay, apiCall]);
-      const data = response?.data;
-
-      if (!data || !data.prediction) {
-        throw new Error('Prediction service returned an incomplete response.');
-      }
-
-      // Hide loading state
-      stopStepAnimation();
-      if (loadingSection) loadingSection.style.display = 'none';
-
-      // Render persistent result
-      renderResult(data);
-
-    } catch (err) {
-      stopStepAnimation();
-      if (loadingSection) loadingSection.style.display = 'none';
-
-      // Display clean error state
-      if (errorSection) {
-        if (errorMessage) {
-          errorMessage.textContent = err.message || 'Please check your connection and try again.';
-        }
-        errorSection.style.display = 'block';
-      }
-    } finally {
-      // Re-enable controls
-      isAnalyzing = false;
-      if (analyzeBtn) {
-        analyzeBtn.disabled = false;
-        analyzeBtn.textContent = 'Analyze News';
-      }
-      if (clearBtn) {
-        clearBtn.disabled = false;
-      }
-    }
-  }
-
-  // Single click listener on Analyze button
-  analyzeBtn?.addEventListener('click', (e) => {
-    e.preventDefault();
-    runAnalysis();
-  });
-
-  // 5. Render Result (Permanently visible until next analysis or user clicks Clear)
-  function renderResult(data) {
+  // 3. Render Completed Result (State: RESULT)
+  function renderResult(data, submittedText, animate = true) {
     if (!resultSection) return;
 
     activePredictionId = data.prediction_id || null;
-
     const isReal = (data.prediction || '').toLowerCase() === 'real';
 
     // 1. Verdict Badge
@@ -217,7 +142,7 @@ function initNewsTest() {
       confidenceValue.textContent = `${confVal.toFixed(1)}%`;
     }
 
-    // 3. Why this result? — Factual explanation based on model training data
+    // 3. Why this result? — Factual model-based pattern attribution
     if (whyResultText) {
       if (isReal) {
         whyResultText.textContent =
@@ -231,16 +156,195 @@ function initNewsTest() {
     // 4. Reveal Result Section
     resultSection.style.display = 'block';
 
-    // 5. Animate Horizontal Confidence Progress Bar
+    // 5. Progress bar width
     if (confidenceFill) {
-      confidenceFill.style.width = '0%';
-      requestAnimationFrame(() => {
+      if (animate) {
+        confidenceFill.style.width = '0%';
+        requestAnimationFrame(() => {
+          confidenceFill.style.width = `${confVal.toFixed(1)}%`;
+        });
+      } else {
         confidenceFill.style.width = `${confVal.toFixed(1)}%`;
-      });
+      }
+    }
+
+    // 6. Persist to session storage so switching tabs or browser discarding never loses it
+    saveState(data, submittedText);
+  }
+
+  // 4. Reset to Initial State (State: INITIAL)
+  // ONLY triggered when the user explicitly clicks "Try New News" or "Clear"
+  function resetToInitialState() {
+    clearSavedState();
+    activePredictionId = null;
+    stopStepAnimation();
+
+    // 1. Hide result
+    if (resultSection) resultSection.style.display = 'none';
+
+    // 2. Clear article textarea
+    if (articleInput) articleInput.value = '';
+
+    // 3. Reset character count
+    updateCharacterCount();
+
+    // 4. Clear explanation & confidence
+    if (whyResultText) whyResultText.textContent = '';
+    if (confidenceValue) confidenceValue.textContent = '0.0%';
+    if (confidenceFill) confidenceFill.style.width = '0%';
+
+    // 5. Remove loading & error states
+    if (loadingSection) loadingSection.style.display = 'none';
+    if (errorSection) errorSection.style.display = 'none';
+    if (validationMsg) {
+      validationMsg.style.display = 'none';
+      validationMsg.textContent = '';
+    }
+
+    // 6. Enable Analyze News again & focus textarea
+    if (analyzeBtn) {
+      analyzeBtn.disabled = false;
+      analyzeBtn.textContent = 'Analyze News';
+    }
+    if (clearBtn) {
+      clearBtn.disabled = false;
+    }
+
+    articleInput?.focus();
+  }
+
+  // "Try New News" button handler
+  tryNewNewsBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    resetToInitialState();
+  });
+
+  // Secondary Clear button handler for initial input state
+  clearBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (isAnalyzing) return;
+    resetToInitialState();
+  });
+
+  // 5. Primary Analysis Trigger
+  async function runAnalysis() {
+    if (isAnalyzing) return;
+
+    const text = articleInput?.value.trim() || '';
+
+    // Validate minimum input
+    if (!text || text.length < 15) {
+      if (validationMsg) {
+        validationMsg.textContent = 'Please enter at least 15 characters of article text.';
+        validationMsg.style.display = 'block';
+      }
+      articleInput?.focus();
+      return;
+    }
+
+    // Transition to ANALYZING state
+    if (validationMsg) validationMsg.style.display = 'none';
+    if (resultSection) resultSection.style.display = 'none';
+    if (errorSection) errorSection.style.display = 'none';
+    if (confidenceFill) confidenceFill.style.width = '0%';
+
+    isAnalyzing = true;
+    if (analyzeBtn) {
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = 'Analyzing...';
+    }
+    if (clearBtn) {
+      clearBtn.disabled = true;
+    }
+
+    if (loadingSection) loadingSection.style.display = 'block';
+    startStepAnimation();
+
+    const minStepDelay = new Promise((resolve) => setTimeout(resolve, 1400));
+    const apiCall = window.VerifaiAPI.predictText(text);
+
+    try {
+      const [_, response] = await Promise.all([minStepDelay, apiCall]);
+      const data = response?.data;
+
+      if (!data || !data.prediction) {
+        throw new Error('Prediction service returned an incomplete response.');
+      }
+
+      // Hide loading
+      stopStepAnimation();
+      if (loadingSection) loadingSection.style.display = 'none';
+
+      // Transition to RESULT state
+      renderResult(data, text, true);
+
+    } catch (err) {
+      stopStepAnimation();
+      if (loadingSection) loadingSection.style.display = 'none';
+
+      if (errorSection) {
+        if (errorMessage) {
+          errorMessage.textContent = err.message || 'Please check your connection and try again.';
+        }
+        errorSection.style.display = 'block';
+      }
+    } finally {
+      isAnalyzing = false;
+      if (analyzeBtn) {
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'Analyze News';
+      }
+      if (clearBtn) {
+        clearBtn.disabled = false;
+      }
     }
   }
 
-  // 6. Feedback Modal Handlers (Discrepancy Reporting)
+  analyzeBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    runAnalysis();
+  });
+
+  // 6. Tab Switching & Page Visibility Guard
+  // Ensures that when the user switches tabs, minimizes the browser, or returns,
+  // the completed result is NEVER hidden.
+  function ensureActiveResultVisible() {
+    const saved = getSavedState();
+    if (saved && saved.data) {
+      if (resultSection && resultSection.style.display !== 'block') {
+        if (articleInput && !articleInput.value) {
+          articleInput.value = saved.text || '';
+          updateCharacterCount();
+        }
+        renderResult(saved.data, saved.text || '', false);
+      }
+    }
+  }
+
+  // Restore on initial load if user already had an active prediction in this session
+  const existingSaved = getSavedState();
+  if (existingSaved && existingSaved.data) {
+    if (articleInput && !articleInput.value) {
+      articleInput.value = existingSaved.text || '';
+    }
+    updateCharacterCount();
+    renderResult(existingSaved.data, existingSaved.text || '', false);
+  } else {
+    updateCharacterCount();
+  }
+
+  // Re-verify on tab focus / visibilitychange / pageshow
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      ensureActiveResultVisible();
+    }
+  });
+
+  window.addEventListener('pageshow', () => {
+    ensureActiveResultVisible();
+  });
+
+  // 7. Feedback Modal Handlers (Discrepancy Reporting)
   openFeedbackBtn?.addEventListener('click', (e) => {
     e.preventDefault();
     if (feedbackModal) feedbackModal.classList.add('open');
