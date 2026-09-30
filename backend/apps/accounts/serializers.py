@@ -10,6 +10,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     Serializer for viewing and updating user profile information.
     """
     full_name = serializers.CharField(read_only=True)
+    organization = serializers.CharField(source='institution', read_only=True)
 
     class Meta:
         model = User
@@ -20,6 +21,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'last_name',
             'full_name',
             'institution',
+            'organization',
             'role',
             'is_staff',
             'date_joined',
@@ -31,6 +33,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
     Serializer for registering a new user account with secure password validation.
+    Supports organization/institution name.
     """
     password = serializers.CharField(
         write_only=True,
@@ -43,6 +46,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         required=True,
         style={'input_type': 'password'}
     )
+    organization = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        help_text="Organization or institute name"
+    )
 
     class Meta:
         model = User
@@ -53,6 +62,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'institution',
+            'organization',
             'role',
         ]
 
@@ -65,10 +75,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs.get('password') != attrs.get('confirm_password'):
             raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+
+        # Map organization to institution if provided
+        org = attrs.pop('organization', None)
+        if org and not attrs.get('institution'):
+            attrs['institution'] = org.strip()
+
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop('confirm_password')
+        validated_data.pop('confirm_password', None)
+        validated_data.pop('organization', None)
         password = validated_data.pop('password')
         user = User.objects.create_user(password=password, **validated_data)
         return user

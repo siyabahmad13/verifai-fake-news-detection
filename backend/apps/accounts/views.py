@@ -39,7 +39,7 @@ class RegisterView(APIView):
     @extend_schema(
         request=UserRegistrationSerializer,
         responses={201: OpenApiResponse(description="User registered successfully")},
-        summary="Register a new researcher account"
+        summary="Register a new organization or user account"
     )
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

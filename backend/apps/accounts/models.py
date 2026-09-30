@@ -58,8 +58,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     role = models.CharField(
         max_length=50,
-        default='Researcher',
-        help_text="User role (e.g. Researcher, Fact-Checker, Student, Admin)"
+        default='Member',
+        help_text="User role (e.g. Member, Analyst, Admin)"
     )
 
     is_active = models.BooleanField(

@@ -213,7 +213,7 @@ function initAuthUI() {
   } else {
     authContainer.innerHTML = `
       <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
-      <a href="signup.html" class="btn btn-primary btn-sm">Register</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">Get Started</a>
     `;
   }
 }
@@ -237,10 +237,7 @@ function getScanHistory() {
       console.error('Failed to parse scan history', e);
     }
   }
-  // Initialize with mock defaults if first time
-  const defaults = window.VERIFAI_DATA ? window.VERIFAI_DATA.initialHistory : [];
-  localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(defaults));
-  return defaults;
+  return [];
 }
 
 function saveScanRecord(record) {

@@ -1,14 +1,12 @@
 ﻿/**
- * VERIFAI — Authentication Controller (Mock Auth, Form Validation & Route Protection)
+ * VerifAI — Authentication Controller
+ * Handles organization login, registration, and session routing.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   // If already authenticated, redirect to destination
   if (window.isAuthenticated && window.isAuthenticated()) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const redirectTarget = urlParams.get('redirect');
-    const validTargets = ['detector.html', 'dashboard.html', 'history.html'];
-    const destination = (redirectTarget && validTargets.includes(redirectTarget)) ? redirectTarget : 'dashboard.html';
+    const destination = getSafeRedirectDestination();
     window.location.replace(destination);
     return;
   }
@@ -29,15 +27,15 @@ function checkRedirectParams() {
   const alertText = document.getElementById('authAlertText');
 
   if ((isAuthRequired || redirectTarget) && alertEl) {
-    alertEl.style.display = 'flex';
+    alertEl.style.display = 'block';
     if (alertText && redirectTarget) {
       const pageNames = {
-        'detector.html': 'Forensic Detector Workbench',
-        'dashboard.html': 'Analytics Dashboard',
-        'history.html': 'Verification Audit History'
+        'detector.html': 'News Article Detector',
+        'dashboard.html': 'Dashboard',
+        'history.html': 'Prediction History'
       };
       const pageTitle = pageNames[redirectTarget] || 'Protected Workspace';
-      alertText.textContent = `Please sign in or create an account to access the ${pageTitle}.`;
+      alertText.textContent = `Please sign in or create an account to access ${pageTitle}.`;
     }
   }
 
@@ -59,28 +57,20 @@ function getSafeRedirectDestination() {
   const urlParams = new URLSearchParams(window.location.search);
   const redirectTarget = urlParams.get('redirect');
   const validTargets = ['detector.html', 'dashboard.html', 'history.html'];
-  return (redirectTarget && validTargets.includes(redirectTarget)) ? redirectTarget : 'dashboard.html';
+  return (redirectTarget && validTargets.includes(redirectTarget)) ? redirectTarget : 'detector.html';
 }
 
 function initLoginForm() {
   const loginForm = document.getElementById('loginForm');
-  const demoFillBtn = document.getElementById('demoFillBtn');
   const togglePassBtn = document.getElementById('togglePasswordBtn');
   const passwordInput = document.getElementById('passwordInput');
+  const submitBtn = document.getElementById('submitLoginBtn');
 
   // Toggle password visibility
   togglePassBtn?.addEventListener('click', () => {
     const isPassword = passwordInput.type === 'password';
     passwordInput.type = isPassword ? 'text' : 'password';
     togglePassBtn.textContent = isPassword ? 'Hide' : 'Show';
-  });
-
-  // Demo auto-fill
-  demoFillBtn?.addEventListener('click', () => {
-    const emailInput = document.getElementById('emailInput');
-    if (emailInput) emailInput.value = 'researcher@verifai.org';
-    if (passwordInput) passwordInput.value = 'VerifAI_2026!Secure';
-    showToast('Demo credentials filled.', 'info');
   });
 
   // Handle Login Submit
@@ -90,36 +80,54 @@ function initLoginForm() {
     const password = passwordInput?.value;
 
     if (!email || !password) {
-      showToast('Please fill in both email and password.', 'error');
+      showToast('Please enter both email and password.', 'error');
       return;
     }
 
-    // Attempt backend API login if available
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in...';
+    }
+
+    // Attempt backend API login
+    let backendUser = null;
     if (window.VerifaiAPI && typeof window.VerifaiAPI.login === 'function') {
       try {
-        await window.VerifaiAPI.login(email, password);
+        const res = await window.VerifaiAPI.login(email, password);
+        if (res?.data?.user) {
+          backendUser = res.data.user;
+        }
       } catch (err) {
-        // Fallback to client mock session if backend is offline
-        console.warn('Backend login fallback to local session:', err.message);
+        console.warn('Backend login message:', err.message);
+        if (err.data && err.data.errors) {
+          const firstErr = Object.values(err.data.errors)[0];
+          showToast(Array.isArray(firstErr) ? firstErr[0] : (err.message || 'Login failed'), 'error');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
+          }
+          return;
+        }
       }
     }
 
-    // Set local session
-    const user = {
-      name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    const userName = backendUser?.full_name || email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const user = backendUser || {
+      name: userName,
       email: email,
-      institution: 'University Verification Lab',
-      role: 'Research Analyst',
+      organization: 'Organization Member',
+      institution: 'Organization Member',
+      role: 'Member',
       joined: '2026-09'
     };
 
     setMockUser(user);
-    showToast(`Welcome back, ${user.name}!`, 'success');
+    showToast(`Signed in as ${user.name || user.email}.`, 'success');
 
     const destination = getSafeRedirectDestination();
     setTimeout(() => {
       window.location.href = destination;
-    }, 450);
+    }, 350);
   });
 }
 
@@ -127,32 +135,18 @@ function initSignupForm() {
   const signupForm = document.getElementById('signupForm');
   const passwordInput = document.getElementById('signupPassword');
   const confirmInput = document.getElementById('signupConfirmPassword');
-  const togglePassBtn = document.getElementById('toggleSignupPasswordBtn');
-
-  // Password strength meter
-  passwordInput?.addEventListener('input', () => {
-    const val = passwordInput.value;
-    updateStrengthMeter(val);
-  });
-
-  // Toggle password
-  togglePassBtn?.addEventListener('click', () => {
-    const isPassword = passwordInput.type === 'password';
-    passwordInput.type = isPassword ? 'text' : 'password';
-    togglePassBtn.textContent = isPassword ? 'Hide' : 'Show';
-  });
+  const submitBtn = document.getElementById('submitSignupBtn');
 
   // Handle Signup Submit
   signupForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const organization = document.getElementById('signupOrganization')?.value.trim();
     const name = document.getElementById('signupName')?.value.trim();
     const email = document.getElementById('signupEmail')?.value.trim();
-    const institution = document.getElementById('signupInstitution')?.value.trim();
     const password = passwordInput?.value;
     const confirm = confirmInput?.value;
-    const terms = document.getElementById('termsCheck')?.checked;
 
-    if (!name || !email || !password) {
+    if (!organization || !name || !email || !password || !confirm) {
       showToast('Please fill in all required fields.', 'error');
       return;
     }
@@ -167,65 +161,60 @@ function initSignupForm() {
       return;
     }
 
-    if (!terms) {
-      showToast('Please agree to the Academic Research & Data Integrity Terms.', 'error');
-      return;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account...';
     }
 
-    // Attempt backend registration if API available
+    const nameParts = name.split(' ');
+    const firstName = nameParts[0] || 'User';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    // Attempt backend registration
+    let backendUser = null;
     if (window.VerifaiAPI && typeof window.VerifaiAPI.register === 'function') {
       try {
-        await window.VerifaiAPI.register({
-          username: email.split('@')[0],
+        const res = await window.VerifaiAPI.register({
           email: email,
           password: password,
-          first_name: name.split(' ')[0] || '',
-          last_name: name.split(' ').slice(1).join(' ') || ''
+          confirm_password: confirm,
+          organization: organization,
+          institution: organization,
+          first_name: firstName,
+          last_name: lastName
         });
+        if (res?.data?.user) {
+          backendUser = res.data.user;
+        }
       } catch (err) {
-        console.warn('Backend register fallback to local session:', err.message);
+        console.warn('Backend register message:', err.message);
+        if (err.data && err.data.errors) {
+          const firstErr = Object.values(err.data.errors)[0];
+          showToast(Array.isArray(firstErr) ? firstErr[0] : (err.message || 'Registration failed'), 'error');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Account';
+          }
+          return;
+        }
       }
     }
 
-    const user = {
+    const user = backendUser || {
       name: name,
       email: email,
-      institution: institution || 'Academic Researcher',
-      role: 'Analyst',
+      organization: organization,
+      institution: organization,
+      role: 'Member',
       joined: new Date().toISOString().slice(0, 7)
     };
 
     setMockUser(user);
-    showToast('Account registered successfully!', 'success');
+    showToast('Account created successfully.', 'success');
 
     const destination = getSafeRedirectDestination();
     setTimeout(() => {
       window.location.href = destination;
-    }, 550);
-  });
-}
-
-function updateStrengthMeter(password) {
-  const bars = [
-    document.getElementById('strBar1'),
-    document.getElementById('strBar2'),
-    document.getElementById('strBar3'),
-    document.getElementById('strBar4')
-  ];
-
-  if (!bars[0]) return;
-
-  let score = 0;
-  if (password.length >= 6) score++;
-  if (password.length >= 10) score++;
-  if (/[A-Z]/.test(password) && /[0-9]/.test(password)) score++;
-  if (/[^A-Za-z0-9]/.test(password)) score++;
-
-  const colors = ['#E7E7E3', '#EF4444', '#F59E0B', '#10B981', '#059669'];
-
-  bars.forEach((bar, idx) => {
-    if (bar) {
-      bar.style.backgroundColor = (idx < score) ? colors[score] : '#E7E7E3';
-    }
+    }, 450);
   });
 }

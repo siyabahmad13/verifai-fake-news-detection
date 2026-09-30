@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VERIFAI — Unified REST API Client
  * Provides seamless bridge between frontend interfaces and the Django REST backend.
  * Features automated token management, graceful offline fallback, and structured error handling.
@@ -173,15 +173,15 @@ const VerifaiAPI = (() => {
     },
 
     /**
-     * Submit prediction feedback
+     * Submit prediction feedback / discrepancy report
      */
-    async submitFeedback(predictionId, isAccurate, comment = '') {
+    async submitFeedback(predictionId, actualLabel, comment = '') {
       return request('/feedback/', {
         method: 'POST',
         body: JSON.stringify({
-          prediction: predictionId,
-          is_accurate: isAccurate,
-          user_comment: comment,
+          prediction_id: predictionId,
+          actual_label: actualLabel,
+          comment: comment,
         }),
       });
     },
@@ -194,10 +194,11 @@ const VerifaiAPI = (() => {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
-      if (data?.data?.access) {
-        setTokens(data.data.access, data.data.refresh);
+      if (data?.data?.tokens?.access) {
+        setTokens(data.data.tokens.access, data.data.tokens.refresh);
         if (data.data.user) {
           localStorage.setItem('verifai_user', JSON.stringify(data.data.user));
+          localStorage.setItem('verifai_mock_user', JSON.stringify(data.data.user));
         }
       }
       return data;
@@ -207,10 +208,18 @@ const VerifaiAPI = (() => {
      * User Authentication: Register
      */
     async register(userData) {
-      return request('/auth/register/', {
+      const data = await request('/auth/register/', {
         method: 'POST',
         body: JSON.stringify(userData),
       });
+      if (data?.data?.tokens?.access) {
+        setTokens(data.data.tokens.access, data.data.tokens.refresh);
+        if (data.data.user) {
+          localStorage.setItem('verifai_user', JSON.stringify(data.data.user));
+          localStorage.setItem('verifai_mock_user', JSON.stringify(data.data.user));
+        }
+      }
+      return data;
     },
 
     /**

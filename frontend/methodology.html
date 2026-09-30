@@ -6,20 +6,15 @@
   <title>Academic Methodology & Architecture — VERIFAI</title>
   <meta name="description" content="Technical documentation detailing dataset benchmarks, feature vectorization pipelines, and explainable AI mechanisms for VERIFAI.">
   <link rel="stylesheet" href="assets/css/main.css">
-  <link rel="stylesheet" href="assets/css/components.css">
 </head>
 <body>
 
   <!-- Site Navigation Header -->
   <header class="site-header">
     <div class="container">
-      <a href="index.html" class="brand-logo" aria-label="VERIFAI Home">
-        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          <path d="m9 12 2 2 4-4"></path>
-        </svg>
-        <span>VERIFAI</span>
-        <span class="brand-tagline">Detection System</span>
+      <a href="index.html" class="brand-logo" aria-label="VerifAI Home">
+        <span>VerifAI</span>
+        <span class="brand-dot"></span>
       </a>
 
       <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
@@ -35,11 +30,10 @@
         <a href="detector.html" class="nav-link">Detector</a>
         <a href="dashboard.html" class="nav-link">Dashboard</a>
         <a href="history.html" class="nav-link">History</a>
-        <a href="methodology.html" class="nav-link active">Methodology</a>
       </nav>
 
       <div id="navAuthContainer" class="nav-actions">
-        <!-- Dynamic auth state -->
+        <!-- Injected dynamically by app.js -->
       </div>
     </div>
   </header>
@@ -184,16 +178,14 @@
 
   <!-- Site Footer -->
   <footer class="site-footer">
-    <div class="container">
-      <div class="footer-bottom">
-        <span>&copy; 2026 VERIFAI Project. Academic research and educational demonstration.</span>
-        <span>Built with HTML5, CSS3, & Vanilla JavaScript.</span>
-      </div>
+    <div class="container text-center" style="display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 0.813rem; color: var(--text-muted);">&copy; 2026 VerifAI. All rights reserved.</span>
+      <a href="index.html" style="font-size: 0.813rem; color: var(--text-secondary);">Back to Home</a>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/api.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>
