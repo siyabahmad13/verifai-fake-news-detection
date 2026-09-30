@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>News Test — VerifAI</title>
-  <meta name="description" content="Test news articles for authenticity with the VerifAI machine learning engine.">
+  <meta name="description" content="Analyze news articles with VerifAI machine learning.">
   <!-- Authentication Route Guard -->
   <script>
     (function() {
@@ -44,63 +44,76 @@
   </header>
 
   <!-- News Test Main -->
-  <main class="workbench-container">
-    <div class="workbench-header">
-      <h1>News Test</h1>
-      <p style="margin-top: 6px; color: var(--text-secondary);">
-        Analyze a news article to evaluate its authenticity.
+  <main class="workbench-container" style="max-width: 760px; padding: 48px 24px 80px 24px; margin: 0 auto;">
+    
+    <div style="margin-bottom: 24px;">
+      <h1 style="font-size: 1.75rem; margin-bottom: 6px;">News Article</h1>
+      <p style="color: var(--text-secondary); font-size: 0.938rem;">
+        Paste your article content below to estimate whether it is likely authentic or misleading.
       </p>
     </div>
 
-    <!-- Input Card -->
-    <div class="workbench-card">
-      <div class="form-group">
-        <label class="form-label" for="headlineInput">Headline <span style="font-weight: normal; color: var(--text-muted);">(optional)</span></label>
-        <input type="text" id="headlineInput" class="form-input" placeholder="Enter headline or article title">
-      </div>
+    <!-- Article Input Card -->
+    <div class="workbench-card" style="padding: 24px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: #FFFFFF;">
+      <form id="newsTestForm" onsubmit="return false;" novalidate>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <textarea 
+            id="articleTextInput" 
+            class="form-textarea" 
+            style="min-height: 220px; font-size: 0.938rem; padding: 14px; width: 100%; resize: vertical;" 
+            placeholder="Paste your news article here... (minimum 15 characters)"
+            required
+          ></textarea>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="articleTextInput">News Article</label>
-        <textarea id="articleTextInput" class="form-textarea" style="min-height: 180px;" placeholder="Paste the full text of the news article here..."></textarea>
-      </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.813rem; color: var(--text-muted); margin-bottom: 20px;">
+          <span id="charWordCounter">0 words &bull; 0 characters</span>
+          <button id="clearInputBtn" class="btn btn-ghost btn-sm" type="button" style="font-size: 0.813rem; padding: 4px 8px;">Clear</button>
+        </div>
 
-      <div class="workbench-meta">
-        <span id="charWordCounter">0 words &bull; 0 characters</span>
-        <button id="clearInputBtn" class="btn btn-ghost btn-sm" type="button">Clear</button>
-      </div>
-
-      <div style="margin-top: 24px;">
-        <button id="analyzeBtn" class="btn btn-primary btn-lg" type="button">
-          Analyze News
-        </button>
-      </div>
+        <div>
+          <button id="analyzeBtn" class="btn btn-primary btn-lg" type="submit" style="min-width: 150px; font-weight: 600;">
+            Analyze News
+          </button>
+        </div>
+      </form>
     </div>
 
-    <!-- Result Box -->
-    <div id="resultCard" class="result-card" style="display: none; margin-top: 32px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+    <!-- Result Section -->
+    <div id="resultCard" class="result-card" style="display: none; margin-top: 28px; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 24px; background-color: var(--bg-surface);">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center;">
         <div>
-          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 6px;">Result</div>
-          <div id="verdictBadge" class="verdict-badge real" style="font-size: 1.1rem; padding: 8px 18px;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 8px;">
+            Prediction
+          </div>
+          <div id="verdictBadge" class="verdict-badge real" style="font-size: 1.15rem; font-weight: 800; padding: 8px 18px; letter-spacing: 0.05em;">
             REAL
           </div>
         </div>
 
         <div style="text-align: right;">
-          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px;">Confidence</div>
-          <div id="confidenceVal" style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">95.0%</div>
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 6px;">
+            Confidence
+          </div>
+          <div id="confidenceVal" style="font-size: 2rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-mono);">
+            95.0%
+          </div>
         </div>
       </div>
 
-      <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-light);">
-        <button id="resetAnalysisBtn" class="btn btn-secondary btn-sm" type="button">
-          Analyze Another
-        </button>
-        <button id="openFeedbackModalBtn" class="btn btn-ghost btn-sm" type="button" style="text-decoration: underline;">
-          Report Issue
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-light); font-size: 0.813rem;">
+        <span style="color: var(--text-muted);">Result saved to your history.</span>
+        <button id="openFeedbackModalBtn" class="btn btn-ghost btn-sm" type="button" style="text-decoration: underline; font-size: 0.813rem; padding: 0; color: var(--text-secondary);">
+          Report Discrepancy
         </button>
       </div>
     </div>
+
+    <!-- Useful Note Section Below -->
+    <div style="margin-top: 32px; padding: 18px 20px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background-color: #FAFAFA; font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+      <strong style="color: var(--text-primary);">Note:</strong> VerifAI provides machine learning predictions based on linguistic pattern analysis. Predictions are probabilistic decision-support estimates rather than verified factual truth.
+    </div>
+
   </main>
 
   <!-- Feedback Modal -->
@@ -113,7 +126,7 @@
       
       <div class="modal-body">
         <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 18px;">
-          If you believe this prediction was inaccurate, report it to help us review model predictions.
+          If you believe this prediction was inaccurate, report it to help us review model classifications.
         </p>
 
         <div class="form-group">
