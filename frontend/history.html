@@ -1,15 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prediction History — VerifAI</title>
-  <meta name="description" content="Chronological record of verified news content and credibility scores.">
+  <title>History — VerifAI</title>
+  <meta name="description" content="Review your past news verification analyses and confidence scores.">
   <!-- Authentication Route Guard -->
   <script>
     (function() {
-      var user = localStorage.getItem('verifai_mock_user') || localStorage.getItem('verifai_access_token') || localStorage.getItem('verifai_user');
-      if (!user) {
+      var token = localStorage.getItem('verifai_access_token');
+      var user = localStorage.getItem('verifai_user');
+      if (!token || !user) {
         window.location.replace('login.html?redirect=history.html&auth=required');
       }
     })();
@@ -18,130 +19,93 @@
 </head>
 <body>
 
-  <!-- Site Navigation Header -->
-  <header class="site-header">
-    <div class="container">
-      <a href="index.html" class="brand-logo" aria-label="VerifAI Home">
-        <span>VerifAI</span>
-        <span class="brand-dot"></span>
-      </a>
-
-      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">VerifAI</a>
+      <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="detector.html" class="nav-link">News Test</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="privacy.html" class="nav-link">Privacy</a>
+        <a href="terms.html" class="nav-link">Terms</a>
+      </nav>
+      <div class="nav-actions" id="navAuthContainer">
+        <!-- Injected dynamically by app.js -->
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
-
-      <nav id="navMenu" class="nav-menu">
-        <a href="detector.html" class="nav-link">Detector</a>
-        <a href="dashboard.html" class="nav-link">Dashboard</a>
-        <a href="history.html" class="nav-link active">History</a>
-      </nav>
-
-      <div id="navAuthContainer" class="nav-actions">
-        <!-- Injected dynamically by app.js -->
-      </div>
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- History Main -->
   <main class="main-content">
-    <div class="dashboard-container">
+    <div class="container" style="padding-top: 40px; padding-bottom: 80px;">
       
-      <div class="dashboard-header">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
         <div>
           <h1>Prediction History</h1>
-          <p class="lead" style="margin-top: 4px;">
-            Search and review previous news analyses.
+          <p style="margin-top: 4px; color: var(--text-secondary);">
+            Previous news analyses performed under your account.
           </p>
         </div>
 
         <a href="detector.html" class="btn btn-primary">
-          Check an Article
+          Test News
         </a>
       </div>
 
-      <!-- Table Container -->
+      <!-- History Table Container -->
       <div class="table-container">
-        
-        <!-- Table Toolbar: Search & Filters -->
-        <div class="table-header">
-          <div style="flex: 1; max-width: 320px;">
-            <input type="text" id="historySearchInput" class="form-input" placeholder="Search headlines or claims...">
-          </div>
-
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <select id="verdictFilterSelect" class="form-select" style="width: auto; padding: 8px 12px; font-size: 0.875rem;">
-              <option value="ALL">All Verdicts</option>
-              <option value="REAL">Real News</option>
-              <option value="FAKE">Fake News</option>
-            </select>
-
-            <button id="clearHistoryBtn" class="btn btn-ghost btn-sm" type="button">
-              Clear History
-            </button>
-          </div>
-        </div>
-
         <table class="data-table">
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Article / Headline</th>
-              <th>Prediction</th>
-              <th>Confidence</th>
-              <th style="text-align: right;">Action</th>
+              <th style="width: 160px;">Date</th>
+              <th>Headline</th>
+              <th style="width: 140px;">Result</th>
+              <th style="width: 140px;">Confidence</th>
             </tr>
           </thead>
           <tbody id="historyTableBody">
-            <!-- Injected dynamically by dashboard.js -->
             <tr>
-              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">
-                No analyses found matching your query.
+              <td colspan="4" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                Loading prediction history...
               </td>
             </tr>
           </tbody>
         </table>
-
       </div>
 
     </div>
   </main>
 
-  <!-- Scan Details Modal -->
-  <div id="scanDetailsModal" class="modal-backdrop">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 class="modal-title">Analysis Record</h3>
-        <button id="closeModalBtn" class="modal-close" type="button">&times;</button>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">VerifAI</div>
+        <p class="footer-tagline">Machine learning platform for estimating news authenticity.</p>
       </div>
-      <div id="scanDetailsBody" class="modal-body">
-        <!-- Injected dynamically -->
-      </div>
-      <div class="modal-footer">
-        <button id="closeModalFooterBtn" class="btn btn-secondary btn-sm" type="button">Close</button>
-        <a href="detector.html" class="btn btn-primary btn-sm">Analyze Another</a>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="login.html">Login</a>
       </div>
     </div>
-  </div>
-
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="container text-center" style="display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 0.813rem; color: var(--text-muted);">&copy; 2026 VerifAI. All rights reserved.</span>
-      <div style="display: flex; gap: 20px;">
-        <a href="detector.html" style="font-size: 0.813rem; color: var(--text-secondary);">Detector</a>
-        <a href="dashboard.html" style="font-size: 0.813rem; color: var(--text-secondary);">Dashboard</a>
-      </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 VerifAI. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script src="assets/js/api.js"></script>
   <script src="assets/js/app.js"></script>
-  <script src="assets/js/dashboard.js"></script>
+  <script src="assets/js/history.js"></script>
 </body>
 </html>

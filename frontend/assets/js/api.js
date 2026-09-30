@@ -198,7 +198,6 @@ const VerifaiAPI = (() => {
         setTokens(data.data.tokens.access, data.data.tokens.refresh);
         if (data.data.user) {
           localStorage.setItem('verifai_user', JSON.stringify(data.data.user));
-          localStorage.setItem('verifai_mock_user', JSON.stringify(data.data.user));
         }
       }
       return data;
@@ -216,7 +215,6 @@ const VerifaiAPI = (() => {
         setTokens(data.data.tokens.access, data.data.tokens.refresh);
         if (data.data.user) {
           localStorage.setItem('verifai_user', JSON.stringify(data.data.user));
-          localStorage.setItem('verifai_mock_user', JSON.stringify(data.data.user));
         }
       }
       return data;

@@ -33,8 +33,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
     Serializer for registering a new user account with secure password validation.
-    Supports organization/institution name.
+    Accepts name, email, and password.
     """
+    name = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        help_text="Full name of the user"
+    )
     password = serializers.CharField(
         write_only=True,
         required=True,
@@ -43,19 +49,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     )
     confirm_password = serializers.CharField(
         write_only=True,
-        required=True,
+        required=False,
+        allow_blank=True,
         style={'input_type': 'password'}
     )
     organization = serializers.CharField(
         write_only=True,
         required=False,
         allow_blank=True,
-        help_text="Organization or institute name"
+        help_text="Optional organization or affiliation"
     )
 
     class Meta:
         model = User
         fields = [
+            'name',
             'email',
             'password',
             'confirm_password',
@@ -65,6 +73,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'organization',
             'role',
         ]
+        extra_kwargs = {
+            'first_name': {'required': False, 'allow_blank': True},
+            'last_name': {'required': False, 'allow_blank': True},
+            'institution': {'required': False, 'allow_blank': True},
+            'role': {'required': False},
+        }
 
     def validate_email(self, value):
         normalized = value.lower().strip()
@@ -73,8 +87,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return normalized
 
     def validate(self, attrs):
-        if attrs.get('password') != attrs.get('confirm_password'):
+        confirm_pass = attrs.get('confirm_password')
+        if confirm_pass and attrs.get('password') != confirm_pass:
             raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+
+        # Map name to first_name and last_name if supplied
+        name = attrs.pop('name', None)
+        if name and not attrs.get('first_name'):
+            parts = name.strip().split(maxsplit=1)
+            attrs['first_name'] = parts[0] if parts else ''
+            attrs['last_name'] = parts[1] if len(parts) > 1 else ''
 
         # Map organization to institution if provided
         org = attrs.pop('organization', None)
@@ -85,6 +107,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('confirm_password', None)
+        validated_data.pop('name', None)
         validated_data.pop('organization', None)
         password = validated_data.pop('password')
         user = User.objects.create_user(password=password, **validated_data)

@@ -1,221 +1,144 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VerifAI — Verify Information with Confidence</title>
+  <title>VerifAI — Understand the news before you trust it</title>
   <meta name="description" content="VerifAI uses machine learning to analyze news content and estimate whether it is likely to be real or fake.">
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 
-  <!-- Site Navigation Header -->
-  <header class="site-header">
-    <div class="container">
-      <a href="index.html" class="brand-logo" aria-label="VerifAI Home">
-        <span>VerifAI</span>
-        <span class="brand-dot"></span>
-      </a>
-
-      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">VerifAI</a>
+      <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="detector.html" class="nav-link">News Test</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="privacy.html" class="nav-link">Privacy</a>
+        <a href="terms.html" class="nav-link">Terms</a>
+      </nav>
+      <div class="nav-actions" id="navAuthContainer">
+        <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+        <a href="signup.html" class="btn btn-primary btn-sm">Sign Up</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
-
-      <nav id="navMenu" class="nav-menu">
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#pricing" class="nav-link">Pricing</a>
-        <a href="#about" class="nav-link">About</a>
-      </nav>
-
-      <div id="navAuthContainer" class="nav-actions">
-        <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
-        <a href="signup.html" class="btn btn-primary btn-sm">Get Started</a>
-      </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="main-content">
-
-    <!-- Hero Section -->
-    <section class="section hero-section">
-      <div class="container container-narrow">
-        <h1 class="hero-title">Verify information with confidence.</h1>
-        <p class="hero-subtitle">
-          VerifAI uses machine learning to analyze news content and estimate whether it is likely to be real or fake.
-        </p>
-        <div class="hero-actions">
-          <a href="signup.html" id="heroGetStartedBtn" class="btn btn-primary btn-lg">Get Started</a>
-          <a href="#how-it-works" class="btn btn-secondary btn-lg">See How It Works</a>
-        </div>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container hero-container">
+      <h1 class="hero-title">Understand the news before you trust it.</h1>
+      <p class="hero-subtitle">
+        VerifAI uses trained machine learning models to analyze news articles and estimate whether content is likely authentic or misleading.
+      </p>
+      <div class="hero-actions">
+        <a href="detector.html" class="btn btn-primary btn-lg" id="heroTestNewsBtn">Test News</a>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- How It Works Section -->
-    <section id="how-it-works" class="section section-border">
-      <div class="container">
-        <div class="section-header text-center">
-          <span class="section-tag">Process</span>
-          <h2>How It Works</h2>
-        </div>
+  <!-- About VerifAI Section -->
+  <section class="section" style="border-top: 1px solid var(--border-light); background-color: var(--bg-surface);">
+    <div class="container" style="max-width: 820px; text-align: center;">
+      <h2 style="margin-bottom: 16px;">About VerifAI</h2>
+      <p style="font-size: 1.125rem; line-height: 1.7; color: var(--text-secondary);">
+        In an era of rapid information exchange, misleading headlines and fabricated articles spread quickly. VerifAI provides automated text assessment powered by Natural Language Processing and statistical classification to assist users in making informed evaluations of news credibility.
+      </p>
+    </div>
+  </section>
 
-        <div class="steps-grid">
-          <div class="step-card">
-            <span class="step-number">01</span>
-            <h3 class="step-title">Submit</h3>
-            <p class="step-desc">Enter a headline, article text, or URL to begin analysis.</p>
-          </div>
-
-          <div class="step-card">
-            <span class="step-number">02</span>
-            <h3 class="step-title">Analyze</h3>
-            <p class="step-desc">VerifAI processes the content using its trained machine-learning model.</p>
-          </div>
-
-          <div class="step-card">
-            <span class="step-number">03</span>
-            <h3 class="step-title">Review</h3>
-            <p class="step-desc">Get the prediction and confidence score with detailed metrics.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="section section-border">
-      <div class="container">
-        <div class="section-header text-center">
-          <span class="section-tag">Capabilities</span>
-          <h2>Features</h2>
-        </div>
-
-        <div class="features-grid">
-          <div class="feature-card">
-            <h3 class="feature-title">News Analysis</h3>
-            <p class="feature-desc">Analyze news content and digital statements using trained natural language processing models.</p>
-          </div>
-
-          <div class="feature-card">
-            <h3 class="feature-title">Confidence Score</h3>
-            <p class="feature-desc">View the model's calibrated confidence probability with each prediction.</p>
-          </div>
-
-          <div class="feature-card">
-            <h3 class="feature-title">Prediction History</h3>
-            <p class="feature-desc">Review and search previous analyses with complete timestamps and audit data.</p>
-          </div>
-
-          <div class="feature-card">
-            <h3 class="feature-title">Feedback System</h3>
-            <p class="feature-desc">Report incorrect predictions to help continuously evaluate and refine the classification model.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section id="pricing" class="section section-border">
-      <div class="container">
-        <div class="section-header text-center">
-          <span class="section-tag">Pricing</span>
-          <h2>Simple, Transparent Plans</h2>
-          <p class="lead" style="margin-top: 8px;">Choose the tier suited for your research or organizational workload.</p>
-        </div>
-
-        <div class="pricing-grid">
-          <!-- Free Plan -->
-          <div class="pricing-card">
-            <div class="pricing-plan">Free</div>
-            <div class="pricing-desc">For individuals and small-scale use.</div>
-            <div class="pricing-price">$0 <span class="pricing-period">/ month</span></div>
-            <ul class="pricing-features">
-              <li>Basic news analysis</li>
-              <li>Prediction results</li>
-              <li>Confidence score</li>
-              <li>Prediction history</li>
-            </ul>
-            <a href="signup.html" class="btn btn-secondary btn-full">Get Started</a>
-          </div>
-
-          <!-- Organization Plan -->
-          <div class="pricing-card featured">
-            <div class="pricing-plan">Organization</div>
-            <div class="pricing-desc">For institutes and organizations.</div>
-            <div class="pricing-price">Custom <span class="pricing-period">/ organization</span></div>
-            <ul class="pricing-features">
-              <li>Higher usage limits</li>
-              <li>Prediction history</li>
-              <li>Feedback system</li>
-              <li>Organization access</li>
-            </ul>
-            <a href="mailto:contact@verifai.org?subject=Organization%20Access" class="btn btn-primary btn-full">Contact Us</a>
-          </div>
-
-          <!-- Enterprise Plan -->
-          <div class="pricing-card">
-            <div class="pricing-plan">Enterprise</div>
-            <div class="pricing-desc">For organizations requiring customized deployment.</div>
-            <div class="pricing-price">Custom <span class="pricing-period">/ deployment</span></div>
-            <ul class="pricing-features">
-              <li>Custom deployment</li>
-              <li>Organization-level access</li>
-              <li>Custom requirements</li>
-              <li>Dedicated support</li>
-            </ul>
-            <a href="mailto:contact@verifai.org?subject=Enterprise%20Inquiry" class="btn btn-secondary btn-full">Contact Us</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="section section-border">
-      <div class="container container-narrow">
-        <div class="about-box">
-          <span class="section-tag">About</span>
-          <p class="about-text">
-            VerifAI is a machine-learning based platform designed to help users analyze news content and identify potentially misleading information.
-          </p>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Site Footer -->
-  <footer class="site-footer">
+  <!-- How It Works Section -->
+  <section class="section" style="border-top: 1px solid var(--border-light);">
     <div class="container">
-      <div class="footer-top">
-        <div class="footer-info">
-          <div class="brand-logo">
-            <span>VerifAI</span>
-            <span class="brand-dot"></span>
-          </div>
-          <p class="footer-desc">
-            Machine-learning platform for automated news content verification.
-          </p>
+      <div class="section-header">
+        <h2>How It Works</h2>
+        <p>A simple three-step process to evaluate news articles.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <h3 class="step-title">Paste News</h3>
+          <p class="step-desc">Enter the headline and full body text of the article you want to verify.</p>
         </div>
 
-        <ul class="footer-links">
-          <li><a href="#features">Features</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="login.html">Sign In</a></li>
-        </ul>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <h3 class="step-title">Analyze</h3>
+          <p class="step-desc">VerifAI processes linguistic patterns using its trained machine learning model.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <h3 class="step-title">Review Result</h3>
+          <p class="step-desc">Receive an instant classification of Real or Fake alongside a confidence score.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section" style="border-top: 1px solid var(--border-light); background-color: var(--bg-surface);">
+    <div class="container">
+      <div class="section-header">
+        <h2>Features</h2>
+        <p>Core capabilities built for news analysis.</p>
       </div>
 
-      <div class="footer-bottom">
-        <span>&copy; 2026 VerifAI. All rights reserved.</span>
-        <span>Clean. Professional. Trustworthy.</span>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3 class="feature-title">News Analysis</h3>
+          <p class="feature-desc">Evaluate article content with natural language preprocessing and vectorization algorithms.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3 class="feature-title">Confidence Score</h3>
+          <p class="feature-desc">View probabilistic confidence metrics with every prediction to gauge certainty.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3 class="feature-title">History</h3>
+          <p class="feature-desc">Access an audit log of your past predictions with timestamps and results.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3 class="feature-title">Feedback</h3>
+          <p class="feature-desc">Submit feedback on model predictions to help refine and improve model accuracy over time.</p>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">VerifAI</div>
+        <p class="footer-tagline">Machine learning platform for estimating news authenticity.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="login.html">Login</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 VerifAI. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script src="assets/js/api.js"></script>
   <script src="assets/js/app.js"></script>
 </body>

@@ -1,6 +1,6 @@
-﻿/**
+/**
  * VerifAI — Authentication Controller
- * Handles organization login, registration, and session routing.
+ * Handles user login, simple registration (Name, Email, Password), and session routing.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,14 +28,8 @@ function checkRedirectParams() {
 
   if ((isAuthRequired || redirectTarget) && alertEl) {
     alertEl.style.display = 'block';
-    if (alertText && redirectTarget) {
-      const pageNames = {
-        'detector.html': 'News Article Detector',
-        'dashboard.html': 'Dashboard',
-        'history.html': 'Prediction History'
-      };
-      const pageTitle = pageNames[redirectTarget] || 'Protected Workspace';
-      alertText.textContent = `Please sign in or create an account to access ${pageTitle}.`;
+    if (alertText) {
+      alertText.textContent = 'Please sign in or create an account to access News Test.';
     }
   }
 
@@ -56,7 +50,7 @@ function checkRedirectParams() {
 function getSafeRedirectDestination() {
   const urlParams = new URLSearchParams(window.location.search);
   const redirectTarget = urlParams.get('redirect');
-  const validTargets = ['detector.html', 'dashboard.html', 'history.html'];
+  const validTargets = ['detector.html', 'history.html'];
   return (redirectTarget && validTargets.includes(redirectTarget)) ? redirectTarget : 'detector.html';
 }
 
@@ -89,75 +83,51 @@ function initLoginForm() {
       submitBtn.textContent = 'Signing in...';
     }
 
-    // Attempt backend API login
-    let backendUser = null;
-    if (window.VerifaiAPI && typeof window.VerifaiAPI.login === 'function') {
-      try {
-        const res = await window.VerifaiAPI.login(email, password);
-        if (res?.data?.user) {
-          backendUser = res.data.user;
-        }
-      } catch (err) {
-        console.warn('Backend login message:', err.message);
-        if (err.data && err.data.errors) {
-          const firstErr = Object.values(err.data.errors)[0];
-          showToast(Array.isArray(firstErr) ? firstErr[0] : (err.message || 'Login failed'), 'error');
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Sign In';
-          }
-          return;
-        }
+    try {
+      const res = await window.VerifaiAPI.login(email, password);
+      showToast('Signed in successfully.', 'success');
+      const destination = getSafeRedirectDestination();
+      setTimeout(() => {
+        window.location.href = destination;
+      }, 350);
+    } catch (err) {
+      let message = err.message || 'Login failed. Please check your credentials.';
+      if (err.data && err.data.errors) {
+        const firstKey = Object.keys(err.data.errors)[0];
+        const firstVal = err.data.errors[firstKey];
+        message = Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
+      } else if (err.data && err.data.message) {
+        message = err.data.message;
+      }
+      showToast(message, 'error');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
       }
     }
-
-    const userName = backendUser?.full_name || email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase());
-    const user = backendUser || {
-      name: userName,
-      email: email,
-      organization: 'Organization Member',
-      institution: 'Organization Member',
-      role: 'Member',
-      joined: '2026-09'
-    };
-
-    setMockUser(user);
-    showToast(`Signed in as ${user.name || user.email}.`, 'success');
-
-    const destination = getSafeRedirectDestination();
-    setTimeout(() => {
-      window.location.href = destination;
-    }, 350);
   });
 }
 
 function initSignupForm() {
   const signupForm = document.getElementById('signupForm');
+  const nameInput = document.getElementById('signupName');
+  const emailInput = document.getElementById('signupEmail');
   const passwordInput = document.getElementById('signupPassword');
-  const confirmInput = document.getElementById('signupConfirmPassword');
   const submitBtn = document.getElementById('submitSignupBtn');
 
-  // Handle Signup Submit
   signupForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const organization = document.getElementById('signupOrganization')?.value.trim();
-    const name = document.getElementById('signupName')?.value.trim();
-    const email = document.getElementById('signupEmail')?.value.trim();
+    const name = nameInput?.value.trim();
+    const email = emailInput?.value.trim();
     const password = passwordInput?.value;
-    const confirm = confirmInput?.value;
 
-    if (!organization || !name || !email || !password || !confirm) {
-      showToast('Please fill in all required fields.', 'error');
+    if (!name || !email || !password) {
+      showToast('Please enter your name, email, and password.', 'error');
       return;
     }
 
     if (password.length < 6) {
-      showToast('Password must be at least 6 characters.', 'error');
-      return;
-    }
-
-    if (password !== confirm) {
-      showToast('Passwords do not match.', 'error');
+      showToast('Password must be at least 6 characters long.', 'error');
       return;
     }
 
@@ -166,55 +136,32 @@ function initSignupForm() {
       submitBtn.textContent = 'Creating account...';
     }
 
-    const nameParts = name.split(' ');
-    const firstName = nameParts[0] || 'User';
-    const lastName = nameParts.slice(1).join(' ') || '';
+    try {
+      const res = await window.VerifaiAPI.register({
+        name: name,
+        email: email,
+        password: password,
+      });
 
-    // Attempt backend registration
-    let backendUser = null;
-    if (window.VerifaiAPI && typeof window.VerifaiAPI.register === 'function') {
-      try {
-        const res = await window.VerifaiAPI.register({
-          email: email,
-          password: password,
-          confirm_password: confirm,
-          organization: organization,
-          institution: organization,
-          first_name: firstName,
-          last_name: lastName
-        });
-        if (res?.data?.user) {
-          backendUser = res.data.user;
-        }
-      } catch (err) {
-        console.warn('Backend register message:', err.message);
-        if (err.data && err.data.errors) {
-          const firstErr = Object.values(err.data.errors)[0];
-          showToast(Array.isArray(firstErr) ? firstErr[0] : (err.message || 'Registration failed'), 'error');
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create Account';
-          }
-          return;
-        }
+      showToast('Account created successfully.', 'success');
+      const destination = getSafeRedirectDestination();
+      setTimeout(() => {
+        window.location.href = destination;
+      }, 350);
+    } catch (err) {
+      let message = err.message || 'Registration failed.';
+      if (err.data && err.data.errors) {
+        const firstKey = Object.keys(err.data.errors)[0];
+        const firstVal = err.data.errors[firstKey];
+        message = Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
+      } else if (err.data && err.data.message) {
+        message = err.data.message;
+      }
+      showToast(message, 'error');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign Up';
       }
     }
-
-    const user = backendUser || {
-      name: name,
-      email: email,
-      organization: organization,
-      institution: organization,
-      role: 'Member',
-      joined: new Date().toISOString().slice(0, 7)
-    };
-
-    setMockUser(user);
-    showToast('Account created successfully.', 'success');
-
-    const destination = getSafeRedirectDestination();
-    setTimeout(() => {
-      window.location.href = destination;
-    }, 450);
   });
 }

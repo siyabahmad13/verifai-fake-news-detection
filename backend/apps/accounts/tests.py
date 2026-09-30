@@ -126,3 +126,17 @@ class AuthenticationTests(TestCase):
         # Attempting to use the blacklisted refresh token must now fail
         blacklisted_res = self.client.post(self.refresh_url, {"refresh": new_refresh}, format='json')
         self.assertEqual(blacklisted_res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_register_simple_name_email_password(self):
+        simple_payload = {
+            "name": "Grace Hopper",
+            "email": "grace@verifai.org",
+            "password": "StrongPassword2026!"
+        }
+        response = self.client.post(self.register_url, simple_payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(response.data['success'])
+        self.assertIn('tokens', response.data['data'])
+        self.assertEqual(response.data['data']['user']['email'], "grace@verifai.org")
+        self.assertEqual(response.data['data']['user']['first_name'], "Grace")
+        self.assertEqual(response.data['data']['user']['last_name'], "Hopper")

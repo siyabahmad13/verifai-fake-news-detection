@@ -1,93 +1,103 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In — VerifAI</title>
-  <meta name="description" content="Sign in to your VerifAI organization or institute account.">
+  <title>Login — VerifAI</title>
+  <meta name="description" content="Sign in to your VerifAI account to analyze news content.">
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 
-  <!-- Site Navigation Header -->
-  <header class="site-header">
-    <div class="container">
-      <a href="index.html" class="brand-logo" aria-label="VerifAI Home">
-        <span>VerifAI</span>
-        <span class="brand-dot"></span>
-      </a>
-
-      <div class="nav-actions">
-        <a href="signup.html" class="btn btn-secondary btn-sm">Create Account</a>
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">VerifAI</a>
+      <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="detector.html" class="nav-link">News Test</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="privacy.html" class="nav-link">Privacy</a>
+        <a href="terms.html" class="nav-link">Terms</a>
+      </nav>
+      <div class="nav-actions" id="navAuthContainer">
+        <a href="login.html" class="btn btn-ghost btn-sm active">Login</a>
+        <a href="signup.html" class="btn btn-primary btn-sm">Sign Up</a>
       </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
     </div>
   </header>
 
-  <!-- Main Auth Body -->
-  <main class="main-content">
-    <div class="auth-wrapper">
-      <div class="auth-card">
-        
-        <div class="auth-header">
-          <h1 class="auth-title">Sign in to VerifAI</h1>
-          <p class="auth-subtitle">Enter your email and password to access your workspace.</p>
+  <!-- Login Main -->
+  <main class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1 class="auth-title">Sign in to VerifAI</h1>
+        <p class="auth-subtitle">Enter your credentials to access your account.</p>
+      </div>
+
+      <!-- Auth Required Notification Banner -->
+      <div id="authRequiredAlert" class="auth-alert" style="display: none;">
+        <span id="authAlertText">Please sign in to access News Test.</span>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="emailInput">Email</label>
+          <input type="email" id="emailInput" class="form-input" placeholder="name@example.com" required autocomplete="email">
         </div>
 
-        <!-- Authentication Required Banner -->
-        <div id="authRequiredAlert" class="auth-alert" style="display: none;">
-          <span id="authAlertText">Please sign in to access the verification workbench.</span>
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" for="passwordInput" style="margin-bottom: 0;">Password</label>
+            <button type="button" id="togglePasswordBtn" class="btn btn-ghost btn-sm" style="padding: 0; font-size: 0.75rem; color: var(--text-muted);">Show</button>
+          </div>
+          <input type="password" id="passwordInput" class="form-input" placeholder="••••••••" required autocomplete="current-password">
         </div>
 
-        <form id="loginForm" class="auth-form">
-          <div class="form-group">
-            <label class="form-label" for="emailInput">Email</label>
-            <input type="email" id="emailInput" class="form-input" placeholder="name@organization.com" required autocomplete="email">
-          </div>
-
-          <div class="form-group">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <label class="form-label" for="passwordInput" style="margin-bottom: 0;">Password</label>
-              <a href="#" onclick="showToast('Password reset link will be sent to your email.', 'info'); return false;" style="font-size: 0.813rem; color: var(--text-muted); text-decoration: underline;">
-                Forgot password?
-              </a>
-            </div>
-            <div style="position: relative;">
-              <input type="password" id="passwordInput" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
-              <button type="button" id="togglePasswordBtn" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 0.75rem; color: var(--text-muted); cursor: pointer;">
-                Show
-              </button>
-            </div>
-          </div>
-
-          <div style="display: flex; align-items: center; margin-bottom: 20px;">
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--text-secondary); cursor: pointer;">
-              <input type="checkbox" id="rememberMeCheck" checked>
-              <span>Remember me</span>
-            </label>
-          </div>
-
-          <button type="submit" id="submitLoginBtn" class="btn btn-primary btn-full btn-lg">
-            Sign In
-          </button>
-        </form>
-
-        <div class="auth-footer">
-          Don't have an account? <a href="signup.html">Create an account</a>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 0.813rem;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-secondary);">
+            <input type="checkbox" id="rememberMe" style="accent-color: var(--text-primary);">
+            <span>Remember me</span>
+          </label>
+          <a href="#" style="color: var(--text-secondary); text-decoration: underline;" onclick="alert('Password reset link will be sent to your registered email.'); return false;">Forgot password?</a>
         </div>
 
+        <button type="submit" id="submitLoginBtn" class="btn btn-primary btn-block">Sign In</button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="signup.html">Sign Up</a>
       </div>
     </div>
   </main>
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="container text-center" style="display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 0.813rem; color: var(--text-muted);">&copy; 2026 VerifAI. All rights reserved.</span>
-      <a href="index.html" style="font-size: 0.813rem; color: var(--text-secondary);">Back to Home</a>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">VerifAI</div>
+        <p class="footer-tagline">Machine learning platform for estimating news authenticity.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="login.html">Login</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 VerifAI. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script src="assets/js/api.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/auth.js"></script>

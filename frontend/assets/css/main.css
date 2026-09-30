@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    VerifAI — Industry SaaS Design System
    Visual Style: Black & White Minimalist, High Contrast, Professional
    ========================================================================== */
@@ -142,7 +142,8 @@ p {
 }
 
 /* Header & Navigation */
-.site-header {
+.site-header,
+.navbar {
   height: var(--navbar-height);
   background-color: #FFFFFF;
   border-bottom: 1px solid var(--border-light);
@@ -151,21 +152,27 @@ p {
   z-index: 100;
 }
 
-.site-header .container {
+.site-header .container,
+.nav-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 24px;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.brand-logo {
+.brand-logo,
+.nav-logo {
   font-size: 1.25rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--text-primary);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  text-decoration: none;
 }
 
 .brand-dot {
@@ -450,27 +457,42 @@ p {
 }
 
 /* Footer */
-.site-footer {
+.site-footer,
+.footer {
   border-top: 1px solid var(--border-light);
   background-color: #FFFFFF;
   padding: 48px 0 32px 0;
   margin-top: auto;
 }
 
-.footer-top {
+.footer-top,
+.footer-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
   flex-wrap: wrap;
   gap: 24px;
 }
 
-.footer-info {
+.footer-info,
+.footer-brand {
   max-width: 320px;
 }
 
-.footer-desc {
+.footer-logo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.footer-desc,
+.footer-tagline {
   font-size: 0.875rem;
   color: var(--text-muted);
   margin-top: 8px;
@@ -478,8 +500,9 @@ p {
 
 .footer-links {
   display: flex;
-  gap: 28px;
+  gap: 24px;
   list-style: none;
+  flex-wrap: wrap;
 }
 
 .footer-links a {
@@ -493,7 +516,10 @@ p {
 }
 
 .footer-bottom {
-  padding-top: 24px;
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 24px 24px 0 24px;
   border-top: 1px solid var(--border-subtle);
   display: flex;
   justify-content: space-between;
@@ -922,6 +948,71 @@ p {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+/* Content & Legal Pages */
+.content-wrapper {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 56px 24px 96px 24px;
+}
+
+.content-header {
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 24px;
+}
+
+.content-header h1 {
+  font-size: 2.25rem;
+  margin-bottom: 8px;
+}
+
+.content-meta {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.content-body h2 {
+  font-size: 1.35rem;
+  margin-top: 36px;
+  margin-bottom: 12px;
+}
+
+.content-body h3 {
+  font-size: 1.1rem;
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+.content-body p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+}
+
+.content-body ul, .content-body ol {
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+
+.content-body li {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.content-notice {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--text-primary);
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  margin: 28px 0;
+  font-size: 0.938rem;
+  line-height: 1.6;
 }
 
 /* Responsive Media Queries */

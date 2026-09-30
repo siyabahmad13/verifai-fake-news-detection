@@ -1,15 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detector — VerifAI</title>
-  <meta name="description" content="Verify news content and articles with VerifAI machine learning.">
+  <title>News Test — VerifAI</title>
+  <meta name="description" content="Test news articles for authenticity with the VerifAI machine learning engine.">
   <!-- Authentication Route Guard -->
   <script>
     (function() {
-      var user = localStorage.getItem('verifai_mock_user') || localStorage.getItem('verifai_access_token') || localStorage.getItem('verifai_user');
-      if (!user) {
+      var token = localStorage.getItem('verifai_access_token');
+      var user = localStorage.getItem('verifai_user');
+      if (!token || !user) {
         window.location.replace('login.html?redirect=detector.html&auth=required');
       }
     })();
@@ -18,139 +19,87 @@
 </head>
 <body>
 
-  <!-- Site Navigation Header -->
-  <header class="site-header">
-    <div class="container">
-      <a href="index.html" class="brand-logo" aria-label="VerifAI Home">
-        <span>VerifAI</span>
-        <span class="brand-dot"></span>
-      </a>
-
-      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">VerifAI</a>
+      <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="detector.html" class="nav-link active">News Test</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="privacy.html" class="nav-link">Privacy</a>
+        <a href="terms.html" class="nav-link">Terms</a>
+      </nav>
+      <div class="nav-actions" id="navAuthContainer">
+        <!-- Injected dynamically by app.js -->
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
-
-      <nav id="navMenu" class="nav-menu">
-        <a href="detector.html" class="nav-link active">Detector</a>
-        <a href="dashboard.html" class="nav-link">Dashboard</a>
-        <a href="history.html" class="nav-link">History</a>
-      </nav>
-
-      <div id="navAuthContainer" class="nav-actions">
-        <!-- Injected dynamically by app.js -->
-      </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="workbench-container">
-      
-      <div class="workbench-header">
-        <h1>Check a News Article</h1>
-        <p class="lead" style="margin-top: 6px;">
-          Analyze news text or an article URL using the VerifAI machine learning model.
-        </p>
+  <!-- News Test Main -->
+  <main class="workbench-container">
+    <div class="workbench-header">
+      <h1>News Test</h1>
+      <p style="margin-top: 6px; color: var(--text-secondary);">
+        Analyze a news article to evaluate its authenticity.
+      </p>
+    </div>
+
+    <!-- Input Card -->
+    <div class="workbench-card">
+      <div class="form-group">
+        <label class="form-label" for="headlineInput">Headline <span style="font-weight: normal; color: var(--text-muted);">(optional)</span></label>
+        <input type="text" id="headlineInput" class="form-input" placeholder="Enter headline or article title">
       </div>
 
-      <!-- Input Tabs -->
-      <div class="workbench-tabs">
-        <button id="tabTextBtn" class="workbench-tab active" type="button">Article Text</button>
-        <button id="tabUrlBtn" class="workbench-tab" type="button">News URL</button>
+      <div class="form-group">
+        <label class="form-label" for="articleTextInput">News Article</label>
+        <textarea id="articleTextInput" class="form-textarea" style="min-height: 180px;" placeholder="Paste the full text of the news article here..."></textarea>
       </div>
 
-      <!-- Workbench Input Card -->
-      <div class="workbench-card">
-        
-        <!-- Text Input Mode -->
-        <div id="textModeContainer">
-          <div class="form-group">
-            <label class="form-label" for="headlineInput">Headline</label>
-            <input type="text" id="headlineInput" class="form-input" placeholder="Enter article headline or claim (optional)">
-          </div>
-
-          <div class="form-group" style="margin-bottom: 8px;">
-            <label class="form-label" for="articleTextInput">Article Text</label>
-            <textarea id="articleTextInput" class="form-textarea" placeholder="Paste or type news article content here... (minimum 15 characters)"></textarea>
-          </div>
-
-          <div class="workbench-meta">
-            <span id="charWordCounter">0 words &bull; 0 characters</span>
-            <button id="clearInputBtn" class="btn btn-ghost btn-sm" type="button">Clear</button>
-          </div>
-        </div>
-
-        <!-- URL Input Mode -->
-        <div id="urlModeContainer" style="display: none;">
-          <div class="form-group">
-            <label class="form-label" for="articleUrlInput">News Article URL</label>
-            <input type="url" id="articleUrlInput" class="form-input" placeholder="https://example.com/news-article-slug">
-            <p class="form-hint">VerifAI will fetch and extract the article text securely before running inference.</p>
-          </div>
-        </div>
-
-        <div style="margin-top: 24px;">
-          <button id="analyzeBtn" class="btn btn-primary btn-lg" style="min-width: 140px;" type="button">
-            Analyze
-          </button>
-        </div>
-
+      <div class="workbench-meta">
+        <span id="charWordCounter">0 words &bull; 0 characters</span>
+        <button id="clearInputBtn" class="btn btn-ghost btn-sm" type="button">Clear</button>
       </div>
 
-      <!-- Result Card -->
-      <div id="resultCard" class="result-card" style="display: none;">
-        
-        <div class="result-header">
-          <div>
-            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 6px;">Prediction Result</div>
-            <div id="verdictBadge" class="verdict-badge real">
-              Likely Real
-            </div>
-          </div>
+      <div style="margin-top: 24px;">
+        <button id="analyzeBtn" class="btn btn-primary btn-lg" type="button">
+          Analyze News
+        </button>
+      </div>
+    </div>
 
-          <div style="text-align: right;">
-            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px;">Confidence</div>
-            <div id="confidenceVal" class="confidence-display">94.2%</div>
+    <!-- Result Box -->
+    <div id="resultCard" class="result-card" style="display: none; margin-top: 32px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div>
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 6px;">Result</div>
+          <div id="verdictBadge" class="verdict-badge real" style="font-size: 1.1rem; padding: 8px 18px;">
+            REAL
           </div>
         </div>
 
-        <div class="result-details">
-          <div>
-            <div class="detail-label">Source Mode</div>
-            <div id="detailSource" class="detail-val">Text</div>
-          </div>
-          <div>
-            <div class="detail-label">Word Count</div>
-            <div id="detailWords" class="detail-val">142 words</div>
-          </div>
-          <div>
-            <div class="detail-label">Model Version</div>
-            <div id="detailModel" class="detail-val">v1-baseline</div>
-          </div>
+        <div style="text-align: right;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px;">Confidence</div>
+          <div id="confidenceVal" style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">95.0%</div>
         </div>
-
-        <div id="excerptContainer" style="margin-bottom: 24px;">
-          <div style="font-size: 0.813rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Analyzed Content Preview:</div>
-          <div id="analyzedPreview" style="background-color: #FFFFFF; border: 1px solid var(--border-light); padding: 14px 16px; border-radius: var(--radius-sm); font-size: 0.875rem; color: var(--text-primary); max-height: 180px; overflow-y: auto; line-height: 1.55;">
-          </div>
-        </div>
-
-        <div class="result-actions">
-          <button id="resetAnalysisBtn" class="btn btn-secondary btn-sm" type="button">
-            Analyze Another Article
-          </button>
-          
-          <button id="openFeedbackModalBtn" class="btn btn-ghost btn-sm" type="button" style="text-decoration: underline;">
-            Report Discrepancy
-          </button>
-        </div>
-
       </div>
 
+      <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-light);">
+        <button id="resetAnalysisBtn" class="btn btn-secondary btn-sm" type="button">
+          Analyze Another
+        </button>
+        <button id="openFeedbackModalBtn" class="btn btn-ghost btn-sm" type="button" style="text-decoration: underline;">
+          Report Issue
+        </button>
+      </div>
     </div>
   </main>
 
@@ -164,42 +113,50 @@
       
       <div class="modal-body">
         <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 18px;">
-          If you believe this prediction was inaccurate, submit a report to help retrain and improve our classification model.
+          If you believe this prediction was inaccurate, report it to help us review model predictions.
         </p>
 
         <div class="form-group">
           <label class="form-label" for="feedbackActualLabel">Correct Verdict</label>
           <select id="feedbackActualLabel" class="form-select">
-            <option value="Real">Real (Authentic Information)</option>
-            <option value="Fake">Fake (Fabricated / Misleading)</option>
+            <option value="Real">Real</option>
+            <option value="Fake">Fake</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="feedbackComment">Reason or Corroborating Source (Optional)</label>
-          <textarea id="feedbackComment" class="form-textarea" style="min-height: 90px;" placeholder="Provide verified URLs or factual explanation..."></textarea>
+          <label class="form-label" for="feedbackComment">Comment (Optional)</label>
+          <textarea id="feedbackComment" class="form-textarea" style="min-height: 80px;" placeholder="Reason or source link..."></textarea>
         </div>
       </div>
 
       <div class="modal-footer">
         <button id="cancelFeedbackBtn" class="btn btn-secondary btn-sm" type="button">Cancel</button>
-        <button id="submitFeedbackBtn" class="btn btn-primary btn-sm" type="button">Submit Report</button>
+        <button id="submitFeedbackBtn" class="btn btn-primary btn-sm" type="button">Submit</button>
       </div>
     </div>
   </div>
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="container text-center" style="display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 0.813rem; color: var(--text-muted);">&copy; 2026 VerifAI. All rights reserved.</span>
-      <div style="display: flex; gap: 20px;">
-        <a href="dashboard.html" style="font-size: 0.813rem; color: var(--text-secondary);">Dashboard</a>
-        <a href="history.html" style="font-size: 0.813rem; color: var(--text-secondary);">History</a>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">VerifAI</div>
+        <p class="footer-tagline">Machine learning platform for estimating news authenticity.</p>
       </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="login.html">Login</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 VerifAI. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script src="assets/js/api.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/detector.js"></script>
