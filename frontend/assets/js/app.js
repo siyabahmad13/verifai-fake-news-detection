@@ -87,8 +87,8 @@ async function logoutUser() {
   const access = localStorage.getItem('verifai_access_token');
   
   if (refresh && access) {
-    try {
-      await fetch('http://localhost:8000/api/auth/logout/', {
+      const logoutUrl = (window.VerifaiAPI && window.VerifaiAPI.getBaseUrl) ? `${window.VerifaiAPI.getBaseUrl()}/auth/logout/` : 'http://127.0.0.1:8000/api/auth/logout/';
+      await fetch(logoutUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

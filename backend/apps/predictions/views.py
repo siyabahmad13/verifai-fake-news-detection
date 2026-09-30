@@ -38,8 +38,15 @@ class PredictTextView(APIView):
         summary="Predict authenticity from raw article text"
     )
     def post(self, request):
+        print(f"[BACKEND] request received at /api/predictions/predict/ from IP: {request.META.get('REMOTE_ADDR')}")
+        user_desc = request.user.email if (request.user and request.user.is_authenticated) else 'anonymous'
+        print(f"[BACKEND] authenticated user: {user_desc}")
+        raw_text = request.data.get('text', '') if isinstance(request.data, dict) else ''
+        print(f"[BACKEND] request body received: text length={len(raw_text)}")
+
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
+            print(f"[BACKEND ERROR] validation failed: {serializer.errors}")
             return error_response(
                 message="Invalid prediction input.",
                 errors=serializer.errors,
@@ -50,8 +57,10 @@ class PredictTextView(APIView):
         headline = serializer.validated_data.get('headline', '')
 
         try:
+            print("[BACKEND] prediction started")
             predictor = get_active_predictor()
             result = predictor.predict(text=text, headline=headline)
+            print(f"[BACKEND] prediction completed: value={result.label}, confidence={result.confidence:.2f}%")
 
             # Persist prediction record
             user = request.user if request.user.is_authenticated else None
@@ -74,17 +83,28 @@ class PredictTextView(APIView):
             )
 
             response_data = PredictionResponseSerializer(record).data
+            print(f"[BACKEND] response sent: status 200, prediction={result.label}, confidence={result.confidence:.2f}%, record_id={record.id}")
             return success_response(
                 data=response_data,
                 message="Content evaluated successfully."
             )
 
         except InputValidationError as e:
+            print(f"[BACKEND ERROR] InputValidationError: {e}")
             return error_response(message=str(e), status_code=status.HTTP_400_BAD_REQUEST)
         except MLEngineError as e:
+            print(f"[BACKEND ERROR] MLEngineError: {e}")
             logger.error("ML Engine processing failure: %s", e)
             return error_response(
                 message="The prediction service encountered an internal error. Please try again.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        except Exception as e:
+            print(f"[BACKEND ERROR] Unexpected exception: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            return error_response(
+                message="An unexpected server error occurred.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 

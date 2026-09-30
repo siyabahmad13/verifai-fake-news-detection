@@ -5,11 +5,15 @@
  */
 
 const VerifaiAPI = (() => {
-  // Base configuration
-  const DEFAULT_BASE_URL = 'http://localhost:8000/api';
+  // Base configuration - Exclusively use IPv4 127.0.0.1 to avoid Windows localhost IPv6 connect failures
+  const DEFAULT_BASE_URL = 'http://127.0.0.1:8000/api';
   
   function getBaseUrl() {
-    return window.VERIFAI_API_URL || localStorage.getItem('verifai_api_url') || DEFAULT_BASE_URL;
+    let url = window.VERIFAI_API_URL || localStorage.getItem('verifai_api_url') || DEFAULT_BASE_URL;
+    if (url.includes('localhost:8000')) {
+      url = url.replace('localhost:8000', '127.0.0.1:8000');
+    }
+    return url;
   }
 
   function getTokens() {
@@ -49,19 +53,26 @@ const VerifaiAPI = (() => {
     const url = `${getBaseUrl()}${endpoint}`;
     const headers = { ...getAuthHeaders(), ...(options.headers || {}) };
 
+    console.log('[NETWORK] Fetching:', url, options.method || 'GET');
     try {
+      const startTime = performance.now();
       const response = await fetch(url, {
         ...options,
         headers,
       });
+      const duration = (performance.now() - startTime).toFixed(1);
+      console.log(`[NETWORK] Received response in ${duration}ms:`, response.status, response.statusText);
 
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
+        console.error('[NETWORK] Non-OK response:', response.status, data);
         // Handle 401 Unauthorized token expiry
         if (response.status === 401 && getTokens().refresh) {
+          console.log('[NETWORK] Attempting token refresh on 401...');
           const refreshed = await refreshToken();
           if (refreshed) {
+            console.log('[NETWORK] Token refreshed, retrying initial request...');
             // Retry initial request once with refreshed token
             return request(endpoint, options);
           }
@@ -76,6 +87,7 @@ const VerifaiAPI = (() => {
 
       return data;
     } catch (err) {
+      console.error('[NETWORK EXCEPTION]:', err.name, err.message);
       // Re-throw with enriched offline flag if network failed completely
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
         const offlineErr = new Error('Backend service unavailable. Using local fallback engine.');
@@ -137,13 +149,45 @@ const VerifaiAPI = (() => {
     },
 
     /**
-     * Predict authenticity of raw text
+     * Predict authenticity of raw text.
+     * Resilient to stale/expired tokens: if 401 occurs, retries anonymously without breaking prediction.
      */
     async predictText(text, headline = '') {
-      return request('/predictions/predict/', {
-        method: 'POST',
-        body: JSON.stringify({ text, headline }),
-      });
+      try {
+        return await request('/predictions/predict/', {
+          method: 'POST',
+          body: JSON.stringify({ text, headline }),
+        });
+      } catch (err) {
+        // If the request fails with 401 (e.g. stale/expired JWT token),
+        // retry the prediction request without the Authorization header since
+        // the prediction endpoint allows unauthenticated requests (AllowAny).
+        if (err.status === 401) {
+          console.warn('[NETWORK] 401 received on prediction endpoint. Retrying anonymously without Authorization header...');
+          const url = `${getBaseUrl()}/predictions/predict/`;
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: JSON.stringify({ text, headline }),
+          });
+
+          const data = await response.json().catch(() => null);
+
+          if (!response.ok) {
+            const errorMessage = data?.message || data?.detail || `HTTP ${response.status}: Request failed`;
+            const retryErr = new Error(errorMessage);
+            retryErr.status = response.status;
+            retryErr.data = data;
+            throw retryErr;
+          }
+
+          return data;
+        }
+        throw err;
+      }
     },
 
     /**

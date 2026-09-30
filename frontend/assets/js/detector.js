@@ -125,7 +125,11 @@ function initNewsTest() {
 
   // 3. Render Completed Result (State: RESULT)
   function renderResult(data, submittedText, animate = true) {
-    if (!resultSection) return;
+    console.log('[8] RESULT RENDER STARTED');
+    if (!resultSection) {
+      console.error('[ERROR] resultSection DOM element is null!');
+      return;
+    }
 
     activePredictionId = data.prediction_id || null;
     const isReal = (data.prediction || '').toLowerCase() === 'real';
@@ -134,12 +138,16 @@ function initNewsTest() {
     if (verdictBadge) {
       verdictBadge.className = `verdict-badge ${isReal ? 'real' : 'fake'}`;
       verdictBadge.textContent = isReal ? 'REAL' : 'FAKE';
+    } else {
+      console.error('[ERROR] verdictBadge DOM element is null!');
     }
 
     // 2. Confidence Metric
     const confVal = Math.max(0, Math.min(100, Number(data.confidence) || 0));
     if (confidenceValue) {
       confidenceValue.textContent = `${confVal.toFixed(1)}%`;
+    } else {
+      console.error('[ERROR] confidenceValue DOM element is null!');
     }
 
     // 3. Why this result? — Factual model-based pattern attribution
@@ -151,6 +159,8 @@ function initNewsTest() {
         whyResultText.textContent =
           'The submitted text contains language and patterns that were more similar to fake-news examples learned during model training.';
       }
+    } else {
+      console.error('[ERROR] whyResultText DOM element is null!');
     }
 
     // 4. Reveal Result Section
@@ -170,6 +180,7 @@ function initNewsTest() {
 
     // 6. Persist to session storage so switching tabs or browser discarding never loses it
     saveState(data, submittedText);
+    console.log('[9] RESULT RENDERED');
   }
 
   // 4. Reset to Initial State (State: INITIAL)
@@ -228,12 +239,16 @@ function initNewsTest() {
 
   // 5. Primary Analysis Trigger
   async function runAnalysis() {
-    if (isAnalyzing) return;
+    if (isAnalyzing) {
+      console.warn('[ANALYZE] Already analyzing, skipping duplicate execution.');
+      return;
+    }
 
     const text = articleInput?.value.trim() || '';
 
     // Validate minimum input
     if (!text || text.length < 15) {
+      console.log('[ERROR] Validation failed: article text too short (length: ' + (text ? text.length : 0) + ')');
       if (validationMsg) {
         validationMsg.textContent = 'Please enter at least 15 characters of article text.';
         validationMsg.style.display = 'block';
@@ -241,6 +256,8 @@ function initNewsTest() {
       articleInput?.focus();
       return;
     }
+
+    console.log('[2] INPUT VALIDATED');
 
     // Transition to ANALYZING state
     if (validationMsg) validationMsg.style.display = 'none';
@@ -258,13 +275,19 @@ function initNewsTest() {
     }
 
     if (loadingSection) loadingSection.style.display = 'block';
+    console.log('[3] LOADING STATE SHOWN');
     startStepAnimation();
 
     const minStepDelay = new Promise((resolve) => setTimeout(resolve, 1400));
+    console.log('[4] API REQUEST STARTED');
     const apiCall = window.VerifaiAPI.predictText(text);
 
     try {
       const [_, response] = await Promise.all([minStepDelay, apiCall]);
+      console.log('[5] API RESPONSE RECEIVED');
+      console.log('[6] RESPONSE STATUS:', response?.status || 200);
+      console.log('[7] RESPONSE BODY:', JSON.stringify(response?.data || response));
+
       const data = response?.data;
 
       if (!data || !data.prediction) {
@@ -279,12 +302,13 @@ function initNewsTest() {
       renderResult(data, text, true);
 
     } catch (err) {
+      console.error('[ERROR]', err.message || err);
       stopStepAnimation();
       if (loadingSection) loadingSection.style.display = 'none';
 
       if (errorSection) {
         if (errorMessage) {
-          errorMessage.textContent = err.message || 'Please check your connection and try again.';
+          errorMessage.textContent = 'Please try again. Make sure the backend server is running.';
         }
         errorSection.style.display = 'block';
       }
@@ -302,6 +326,7 @@ function initNewsTest() {
 
   analyzeBtn?.addEventListener('click', (e) => {
     e.preventDefault();
+    console.log('[1] ANALYZE CLICKED');
     runAnalysis();
   });
 
