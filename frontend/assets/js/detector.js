@@ -76,10 +76,8 @@ function initDetector() {
       // Update active state
       activePredictionRecord = data;
 
-      // Render Result permanently
+      // Render Result permanently in UI
       renderResult(data);
-
-      showToast(`Analysis complete: ${data.prediction.toUpperCase()}.`, 'success');
     } catch (err) {
       showToast(err.message || 'Analysis failed. Please check backend connection.', 'error');
     } finally {
