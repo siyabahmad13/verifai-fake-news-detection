@@ -194,3 +194,106 @@ class UserProfileView(APIView):
             data=serializer.data,
             message="Profile updated successfully."
         )
+
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+from rest_framework.permissions import IsAdminUser
+from apps.core.pagination import StandardResultsSetPagination
+from .models import User
+from .serializers import (
+    AdminUserListSerializer,
+    AdminUserStatusUpdateSerializer,
+)
+
+
+class AdminUserListView(APIView):
+    """
+    List and filter all registered users in VerifAI.
+    Requires Staff / Administrator privileges.
+    """
+    permission_classes = [IsAdminUser]
+    pagination_class = StandardResultsSetPagination
+
+    def get(self, request):
+        queryset = User.objects.all().order_by('-date_joined')
+
+        # Filter by search keyword
+        search = request.query_params.get('search', '').strip()
+        if search:
+            queryset = queryset.filter(
+                Q(email__icontains=search) |
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search) |
+                Q(institution__icontains=search)
+            )
+
+        # Filter by role
+        role = request.query_params.get('role', '').strip()
+        if role:
+            queryset = queryset.filter(role__iexact=role)
+
+        # Filter by is_active status
+        is_active_param = request.query_params.get('is_active', '').strip().lower()
+        if is_active_param in ('true', '1'):
+            queryset = queryset.filter(is_active=True)
+        elif is_active_param in ('false', '0'):
+            queryset = queryset.filter(is_active=False)
+
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request)
+        serializer = AdminUserListSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+
+class AdminUserDetailView(APIView):
+    """
+    Retrieve full account details for an individual user.
+    Requires Staff / Administrator privileges.
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, id):
+        user_obj = get_object_or_404(User, id=id)
+        serializer = AdminUserListSerializer(user_obj)
+        return success_response(
+            data=serializer.data,
+            message="User details retrieved successfully."
+        )
+
+
+class AdminUserToggleStatusView(APIView):
+    """
+    Activate or deactivate a user account.
+    Safety checks prevent an admin from deactivating their own account.
+    """
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, id):
+        user_obj = get_object_or_404(User, id=id)
+
+        # Safety Check: Cannot deactivate own account
+        if request.user.id == user_obj.id:
+            return error_response(
+                message="You cannot deactivate your own administrative account.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = AdminUserStatusUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return error_response(
+                message="Invalid status update payload.",
+                errors=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+        new_status = serializer.validated_data['is_active']
+        user_obj.is_active = new_status
+        user_obj.save(update_fields=['is_active', 'updated_at'])
+
+        status_word = "activated" if new_status else "deactivated"
+        logger.info("Admin %s %s user account %s", request.user.email, status_word, user_obj.email)
+
+        return success_response(
+            data=AdminUserListSerializer(user_obj).data,
+            message=f"User account {user_obj.email} successfully {status_word}."
+        )

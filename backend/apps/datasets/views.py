@@ -80,7 +80,7 @@ class DatasetListView(APIView):
 
 class DatasetDetailView(APIView):
     """
-    Retrieve full metadata and validation diagnostics for a dataset.
+    Retrieve full metadata, validation diagnostics, or delete a dataset.
     """
     permission_classes = [IsAdminUser]
 
@@ -95,6 +95,43 @@ class DatasetDetailView(APIView):
             data=serializer.data,
             message="Dataset metadata retrieved successfully."
         )
+
+    @extend_schema(
+        responses={200: OpenApiResponse(description="Dataset deleted successfully")},
+        summary="Delete a dataset registry and associated file (Admin only)"
+    )
+    def delete(self, request, id):
+        dataset = get_object_or_404(Dataset, id=id)
+        if dataset.file:
+            try:
+                dataset.file.delete(save=False)
+            except Exception as e:
+                logger.warning("Could not delete dataset file %s from disk: %s", dataset.file.name, e)
+        dataset_name = dataset.name
+        dataset.delete()
+        logger.info("Admin %s deleted dataset '%s' (ID: %s)", request.user.email, dataset_name, id)
+        return success_response(message=f"Dataset '{dataset_name}' deleted successfully.")
+
+
+class DatasetDownloadView(APIView):
+    """
+    Securely download an uploaded dataset file.
+    Admin-only access.
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, id):
+        import os
+        from django.http import FileResponse
+        dataset = get_object_or_404(Dataset, id=id)
+        if not dataset.file or not os.path.exists(dataset.file.path):
+            return error_response(
+                message="Dataset file not found on server storage.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+
+        filename = os.path.basename(dataset.file.name)
+        return FileResponse(open(dataset.file.path, 'rb'), as_attachment=True, filename=filename)
 
 
 class MLModelVersionListView(APIView):

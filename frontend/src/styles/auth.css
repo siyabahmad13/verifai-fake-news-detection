@@ -1,0 +1,72 @@
+/* ==========================================================================
+   VERIFAI — Auth Pages (Login & Signup) Styles
+   ========================================================================== */
+
+.auth-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.auth-header {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-title {
+  font-size: 1.65rem;
+  letter-spacing: -0.025em;
+}
+
+.auth-subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-btn-submit {
+  width: 100%;
+  padding: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.auth-footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.auth-footer a {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-footer a:hover {
+  opacity: 0.8;
+}

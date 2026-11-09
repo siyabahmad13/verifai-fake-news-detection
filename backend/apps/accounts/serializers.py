@@ -157,3 +157,41 @@ class UserLogoutSerializer(serializers.Serializer):
             token.blacklist()
         except Exception as e:
             raise serializers.ValidationError({"refresh": "Invalid or expired refresh token."})
+
+
+
+class AdminUserListSerializer(serializers.ModelSerializer):
+    """
+    Administrative serializer for user accounts.
+    Excludes sensitive credential hashes while providing operational metrics.
+    """
+    full_name = serializers.CharField(read_only=True)
+    predictions_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'full_name',
+            'institution',
+            'role',
+            'is_active',
+            'is_staff',
+            'date_joined',
+            'updated_at',
+            'predictions_count',
+        ]
+        read_only_fields = ['id', 'email', 'date_joined', 'updated_at', 'predictions_count']
+
+    def get_predictions_count(self, obj):
+        return obj.predictions.count()
+
+
+class AdminUserStatusUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for toggling user account active status.
+    """
+    is_active = serializers.BooleanField(required=True)

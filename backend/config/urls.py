@@ -13,7 +13,7 @@ from drf_spectacular.views import (
     SpectacularRedocView
 )
 
-from apps.core.views import HealthCheckView
+from apps.core.views import HealthCheckView, AdminOverviewStatsView
 
 urlpatterns = [
     # Django Administration
@@ -21,6 +21,7 @@ urlpatterns = [
 
     # Health Check Probe
     path('api/health/', HealthCheckView.as_view(), name='health'),
+    path('api/admin-stats/', AdminOverviewStatsView.as_view(), name='admin_stats'),
 
     # OpenAPI Schema & Interactive Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

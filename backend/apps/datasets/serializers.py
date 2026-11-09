@@ -47,10 +47,14 @@ class DatasetUploadSerializer(serializers.ModelSerializer):
 
 class DatasetListSerializer(serializers.ModelSerializer):
     """
-    Summary view of registered datasets.
+    Summary view of registered datasets with file metadata for Admin Dashboard.
     """
     dataset_id = serializers.UUIDField(source='id', read_only=True)
     uploaded_by_email = serializers.EmailField(source='uploaded_by.email', read_only=True)
+    file_name = serializers.SerializerMethodField()
+    file_size = serializers.SerializerMethodField()
+    file_type = serializers.SerializerMethodField()
+    file_url = serializers.FileField(source='file', read_only=True)
 
     class Meta:
         model = Dataset
@@ -58,6 +62,10 @@ class DatasetListSerializer(serializers.ModelSerializer):
             'dataset_id',
             'name',
             'version',
+            'file_name',
+            'file_size',
+            'file_type',
+            'file_url',
             'row_count',
             'label_distribution',
             'validation_status',
@@ -65,6 +73,23 @@ class DatasetListSerializer(serializers.ModelSerializer):
             'uploaded_by_email',
             'created_at',
         ]
+
+    def get_file_name(self, obj):
+        import os
+        return os.path.basename(obj.file.name) if obj.file else ''
+
+    def get_file_size(self, obj):
+        try:
+            return obj.file.size if obj.file else 0
+        except Exception:
+            return 0
+
+    def get_file_type(self, obj):
+        import os
+        if not obj.file:
+            return ''
+        ext = os.path.splitext(obj.file.name)[1].lower()
+        return ext.replace('.', '').upper()
 
 
 class DatasetDetailSerializer(serializers.ModelSerializer):

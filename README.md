@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 # VERIFAI
 ### Enterprise AI-Powered Fake News Detection & Natural Language Forensic System
@@ -35,7 +35,11 @@ The platform is designed with a **strictly decoupled machine learning engine**: 
 - **Human-in-the-Loop Feedback**: Integrated adjudication pipeline allowing analysts to flag false positives and trigger model retraining workflows.
 - **Complete REST API & OpenAPI 3.0**: Fully documented interactive endpoints using Swagger UI and ReDoc.
 - **Enterprise Security**: JWT authentication (access & sliding refresh tokens), custom user roles, CORS controls, rate-limiting throttles, and input sanitization.
-- **Zero-Dependency Warm-White UI**: Crafted in pure HTML5, CSS3, and modern Vanilla JavaScript with automatic offline fallback to local heuristic evaluation.
+- **Frontend**: React 18, React Router v6, Vite 5, Modular Modern CSS
+- **Backend**: Django 5.1+, Django REST Framework (DRF) 3.15+, SimpleJWT
+- **Machine Learning**: Scikit-Learn 1.6+, NLTK, TF-IDF Vectorization, Logistic Regression / SVM
+- **Database**: SQLite (local development) / PostgreSQL (production ready)
+- **API Documentation**: OpenAPI 3.0 via drf-spectacular (Swagger UI & ReDoc)
 - **Automated CI/CD**: Pre-configured GitHub Actions running flake8 code linting, automated migrations, OpenAPI schema validation, and 33 backend unit & integration tests.
 
 ---
@@ -112,17 +116,17 @@ VERIFAI/
 ├── datasets/                    # Benchmark documentation & corpus storage
 │   ├── .gitkeep
 │   └── README.md                # Download instructions for ISOT, LIAR, & WELFake
-├── frontend/                    # Modern warm-white editorial user interface
-│   ├── index.html               # Public landing page with interactive mini-demo
-│   ├── detector.html            # Forensic verification workbench with XAI highlights
-│   ├── dashboard.html           # Aggregate metrics, breakdown ratios, KPI cards
-│   ├── history.html             # Searchable verification audit history
-│   ├── methodology.html         # Research specifications and benchmark details
-│   ├── login.html               # Sign in with 1-click researcher credentials
-│   ├── signup.html              # Registration with real-time password strength meter
-│   └── assets/
-│       ├── css/                 # Custom modular stylesheets (no external frameworks)
-│       └── js/                  # API client, detector workbench, and session state
+├── frontend/                    # Modern React 18 + Vite SPA
+│   ├── src/                     # React source components and pages
+│   │   ├── components/          # Reusable UI components (Navbar, Footer, ProtectedRoute, DashboardLayout)
+│   │   ├── context/             # Authentication context & session state
+│   │   ├── pages/               # Route pages (Home, Detector, Dashboard, History, Feedback, Profile, About, etc.)
+│   │   ├── services/            # Centralized API service
+│   │   └── styles/              # Modular component stylesheets
+│   ├── index.html               # Single page application root HTML
+│   ├── package.json             # Frontend dependencies and npm scripts
+│   ├── vite.config.js           # Vite dev server and proxy configuration
+│   └── .env                     # Frontend environment variables (VITE_API_BASE_URL)
 ├── ml/                          # Machine learning models & exploratory artifacts
 │   ├── Verifi-Ai-Model.ipynb    # Jupyter research notebook with exploratory analysis
 │   ├── fake_news_model.pkl      # Production baseline classifier (Logistic Regression)

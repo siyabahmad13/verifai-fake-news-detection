@@ -23,6 +23,27 @@ from .serializers import (
 logger = logging.getLogger(__name__)
 
 
+
+class PredictionStatsView(APIView):
+    """
+    Return aggregate statistics for the authenticated user's predictions and feedback.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        total = Prediction.objects.filter(user=user).count()
+        real = Prediction.objects.filter(user=user, prediction__iexact='Real').count()
+        fake = Prediction.objects.filter(user=user, prediction__iexact='Fake').count()
+        from apps.feedback.models import Feedback
+        feedback_count = Feedback.objects.filter(user=user).count()
+        return success_response(data={
+            'total_predictions': total,
+            'real_count': real,
+            'fake_count': fake,
+            'feedback_count': feedback_count,
+        }, message='Stats retrieved successfully.')
+
 class PredictTextView(APIView):
     """
     Submit raw news article text (and optional headline) for AI-based
@@ -224,6 +245,14 @@ class PredictionHistoryListView(APIView):
                 Q(headline__icontains=search_query) | Q(input_text__icontains=search_query)
             )
 
+        start_date = request.query_params.get('start_date') or request.query_params.get('date_from')
+        if start_date:
+            queryset = queryset.filter(created_at__date__gte=start_date)
+
+        end_date = request.query_params.get('end_date') or request.query_params.get('date_to')
+        if end_date:
+            queryset = queryset.filter(created_at__date__lte=end_date)
+
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request)
         serializer = PredictionHistoryListSerializer(page, many=True)
@@ -278,4 +307,35 @@ class PredictionHistoryDetailView(APIView):
         logger.info("Prediction record deleted: %s by %s", id, request.user.email)
         return success_response(
             message="Prediction record deleted successfully."
+        )
+
+
+class PredictionStatsView(APIView):
+    """
+    Retrieve real-time aggregate statistics for the authenticated user:
+    total predictions, real news count, fake news count, and submitted feedback count.
+    """
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Retrieve aggregate prediction and feedback statistics for the user"
+    )
+    def get(self, request):
+        user = request.user
+        from apps.feedback.models import Feedback
+
+        user_predictions = Prediction.objects.filter(user=user)
+        total_predictions = user_predictions.count()
+        real_count = user_predictions.filter(prediction__iexact='Real').count()
+        fake_count = user_predictions.filter(prediction__iexact='Fake').count()
+        feedback_count = Feedback.objects.filter(user=user).count()
+
+        return success_response(
+            data={
+                "total_predictions": total_predictions,
+                "real_count": real_count,
+                "fake_count": fake_count,
+                "feedback_count": feedback_count,
+            },
+            message="User statistics retrieved successfully."
         )

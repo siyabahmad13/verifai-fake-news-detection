@@ -63,6 +63,9 @@ coverage.xml
 # Build & Packaging
 build/
 dist/
+node_modules/
+frontend/dist/
+frontend/node_modules/
 *.egg-info/
 .installed.cfg
 *.egg

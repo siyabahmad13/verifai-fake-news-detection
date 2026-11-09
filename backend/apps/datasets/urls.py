@@ -3,6 +3,7 @@ from .views import (
     DatasetUploadView,
     DatasetListView,
     DatasetDetailView,
+    DatasetDownloadView,
     MLModelVersionListView,
     MLModelVersionActivateView,
 )
@@ -14,5 +15,6 @@ urlpatterns = [
     path('', DatasetListView.as_view(), name='dataset_list'),
     path('models/', MLModelVersionListView.as_view(), name='model_version_list'),
     path('models/<uuid:id>/activate/', MLModelVersionActivateView.as_view(), name='model_version_activate'),
+    path('<uuid:id>/download/', DatasetDownloadView.as_view(), name='dataset_download'),
     path('<uuid:id>/', DatasetDetailView.as_view(), name='dataset_detail'),
 ]

@@ -1,0 +1,139 @@
+/* ==========================================================================
+   VERIFAI — Editorial & Static Pages (About, Privacy, Terms, 404)
+   ========================================================================== */
+
+.editorial-page {
+  flex: 1;
+  padding: 64px 0 96px 0;
+}
+
+.editorial-container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.editorial-header {
+  margin-bottom: 48px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editorial-tag {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.editorial-title {
+  font-size: 2.75rem;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.editorial-lead {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.editorial-body {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.editorial-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editorial-section h2 {
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  padding-top: 12px;
+}
+
+.editorial-section p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.editorial-section ul {
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editorial-section li {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.callout-box {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.callout-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.callout-text {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 404 Not Found Page */
+.notfound-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+}
+
+.notfound-card {
+  text-align: center;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.notfound-code {
+  font-size: 4rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.notfound-title {
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+
+.notfound-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}

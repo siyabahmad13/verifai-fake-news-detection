@@ -1,0 +1,220 @@
+/* ==========================================================================
+   VERIFAI — Navbar Component Styles
+   ========================================================================== */
+
+.navbar-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(8px);
+}
+
+.navbar-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-link {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 6px 0;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+}
+
+.nav-link.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent);
+}
+
+.nav-auth {
+  display: flex;
+  align-items: center;
+}
+
+.auth-anon-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-nav-login {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  padding: 8px 12px;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-nav-login:hover {
+  opacity: 0.7;
+}
+
+.btn-nav-signup {
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: var(--accent);
+  color: var(--text-inverse);
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.btn-nav-signup:hover {
+  background-color: var(--accent-hover);
+}
+
+.auth-user-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-email-badge {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-nav-logout {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.btn-nav-logout:hover {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+/* Mobile Toggle */
+.navbar-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+}
+
+.toggle-line {
+  width: 100%;
+  height: 2px;
+  background-color: var(--text-primary);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.navbar-toggle.open .toggle-line:nth-child(1) {
+  transform: translateY(3.5px) rotate(45deg);
+}
+
+.navbar-toggle.open .toggle-line:nth-child(2) {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+/* Responsive Drawer */
+@media (max-width: 768px) {
+  .navbar-toggle {
+    display: flex;
+  }
+
+  .navbar-nav {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 24px;
+    gap: 20px;
+    display: none;
+  }
+
+  .navbar-nav.mobile-open {
+    display: flex;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .nav-link {
+    font-size: 1.05rem;
+    width: 100%;
+  }
+
+  .nav-link.active::after {
+    display: none;
+  }
+
+  .nav-auth {
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+    width: 100%;
+  }
+
+  .auth-anon-group,
+  .auth-user-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btn-nav-signup,
+  .btn-nav-login {
+    text-align: center;
+  }
+}

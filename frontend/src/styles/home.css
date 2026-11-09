@@ -1,0 +1,252 @@
+/* ==========================================================================
+   VERIFAI — Home Page Styles
+   Editorial, Minimalist, Black & White Aesthetics
+   ========================================================================== */
+
+.home-root {
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+  padding: 64px 0 96px 0;
+}
+
+/* Hero Section */
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background-color: var(--accent-light);
+  border: 1px solid rgba(136, 19, 55, 0.2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.hero-headline {
+  font-size: 3.25rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+/* Feature Metrics Bar */
+.metrics-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 32px 0;
+  margin: 24px 0;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Section Common Header */
+.section-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 48px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.section-title {
+  font-size: 2rem;
+  letter-spacing: -0.025em;
+}
+
+.section-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* 3-Step Process Grid */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.step-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px 24px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-card);
+}
+
+.step-number {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.step-title {
+  font-size: 1.25rem;
+}
+
+.step-text {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+/* Why VerifAI Pillars */
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.pillar-card {
+  padding: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pillar-title {
+  font-size: 1.15rem;
+}
+
+.pillar-desc {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+/* Responsible AI Box */
+.responsible-ai-box {
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  background-color: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.responsible-ai-title {
+  font-size: 1.15rem;
+}
+
+.responsible-ai-text {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* Final CTA Section */
+.cta-banner {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 64px 32px;
+  text-align: center;
+  background-color: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.cta-title {
+  font-size: 2.25rem;
+  letter-spacing: -0.03em;
+}
+
+.cta-subtitle {
+  font-size: 1.05rem;
+  max-width: 520px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-headline {
+    font-size: 2.25rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-actions .btn-primary,
+  .hero-actions .btn-secondary {
+    width: 100%;
+  }
+
+  .metrics-strip {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .steps-grid,
+  .pillars-grid {
+    grid-template-columns: 1fr;
+  }
+}

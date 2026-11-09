@@ -38,11 +38,24 @@ class ModelLoader:
         return cls._instance
 
     def _resolve_path(self, path_str: str) -> Path:
-        """Resolve relative or absolute path against BASE_DIR."""
+        """Resolve relative or absolute path against BASE_DIR or fallback locations."""
         p = Path(path_str)
-        if not p.is_absolute():
-            p = settings.BASE_DIR / p
-        return p.resolve()
+        if p.is_absolute() and p.exists():
+            return p.resolve()
+
+        candidates = [
+            p,
+            settings.BASE_DIR / p,
+            settings.BASE_DIR.parent / p,
+            Path.cwd() / p,
+            settings.BASE_DIR.parent / 'ml' / p.name,
+            settings.BASE_DIR / 'ml' / p.name,
+        ]
+        for c in candidates:
+            if c.exists():
+                return c.resolve()
+
+        return (settings.BASE_DIR / p).resolve() if not p.is_absolute() else p.resolve()
 
     def load_artifacts(
         self,

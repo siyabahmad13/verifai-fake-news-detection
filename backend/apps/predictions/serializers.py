@@ -44,12 +44,14 @@ class PredictionResponseSerializer(serializers.ModelSerializer):
     Standard output serializer for prediction results.
     """
     prediction_id = serializers.UUIDField(source='id', read_only=True)
+    user_id = serializers.UUIDField(source='user.id', read_only=True, allow_null=True)
     disclaimer = serializers.SerializerMethodField()
 
     class Meta:
         model = Prediction
         fields = [
             'prediction_id',
+            'user_id',
             'prediction',
             'confidence',
             'probabilities',
@@ -73,11 +75,13 @@ class PredictionHistoryListSerializer(serializers.ModelSerializer):
     Condensed serializer for tabular history listing.
     """
     prediction_id = serializers.UUIDField(source='id', read_only=True)
+    user_email = serializers.EmailField(source='user.email', read_only=True, allow_null=True)
 
     class Meta:
         model = Prediction
         fields = [
             'prediction_id',
+            'user_email',
             'headline',
             'input_type',
             'prediction',

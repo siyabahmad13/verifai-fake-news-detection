@@ -26,6 +26,14 @@ class FeedbackCreateSerializer(serializers.ModelSerializer):
             prediction = Prediction.objects.get(id=value)
         except Prediction.DoesNotExist:
             raise serializers.ValidationError("Prediction record not found.")
+
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated and not request.user.is_staff:
+            if prediction.user is not None and prediction.user != request.user:
+                raise serializers.ValidationError(
+                    "You do not have permission to submit feedback for this prediction record."
+                )
+
         self.prediction_instance = prediction
         return value
 
@@ -48,12 +56,14 @@ class FeedbackListSerializer(serializers.ModelSerializer):
     Serializer for list view of user feedback submissions.
     """
     feedback_id = serializers.UUIDField(source='id', read_only=True)
+    user_email = serializers.EmailField(source='user.email', read_only=True, allow_null=True)
     prediction_headline = serializers.CharField(source='prediction.headline', read_only=True)
 
     class Meta:
         model = Feedback
         fields = [
             'feedback_id',
+            'user_email',
             'prediction_id',
             'prediction_headline',
             'predicted_label',
