@@ -535,3 +535,130 @@
     justify-content: center;
   }
 }
+
+
+/* ==========================================================================
+   Tab Navigation Switcher (News vs URL)
+   ========================================================================== */
+
+.detector-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  background-color: var(--bg-card);
+  padding: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  width: fit-content;
+}
+
+.detector-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.detector-tab-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+
+.detector-tab-btn.active {
+  color: var(--primary-wine);
+  background-color: #fdf2f4;
+  border-color: rgba(136, 19, 55, 0.2);
+  font-weight: 600;
+}
+
+/* URL Input Card Styles */
+.url-workspace-card {
+  padding: 32px 28px;
+}
+
+.url-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.url-input-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.url-input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.url-icon-prefix {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.url-input-field {
+  width: 100%;
+  padding: 13px 16px 13px 44px;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.url-input-field:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(136, 19, 55, 0.1);
+}
+
+.url-input-field::placeholder {
+  color: var(--text-muted);
+}
+
+.url-helper-text {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.tested-url-display {
+  margin-top: 6px;
+  word-break: break-all;
+}
+
+.tested-url-display .url-link {
+  color: var(--primary-wine);
+  text-decoration: underline;
+  font-size: 0.875rem;
+}
+
+.result-modality-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
